@@ -161,6 +161,7 @@ if gContratante != 'Selecione...':
             df_statusvirtua_quantidade = dbDistribuicao.consultarStatusVirtuaTotal(gContratante)
             #df_statusvirtua_total = df_statusvirtua["Quantidade"].sum()
             row_df ={"Status" :"Total geral", "Quantidade" : df_statusvirtua_quantidade["Quantidade"].sum()}            
+            df_statusvirtua_quantidade.loc[len(df_statusvirtua_quantidade)] = row_df
             r_ap5[0].container(height=altura+80,).dataframe(df_statusvirtua_quantidade[["Status","Quantidade"]], hide_index=True, width=altura+80)        
             #r_ap5[0].info(f'Total geral: {df_statusvirtua_total}')
             #Grafico
@@ -182,13 +183,15 @@ if gContratante != 'Selecione...':
             df_tipos_statusvirtua = dbDistribuicao.consultarStatusVirtuaDistintos(gContratante)
             df_configuracoes = dbConfiguracao.consultar(gContratante, gAno, gMes)
             df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == "status"]
-            selecionados = st.multiselect('',
+            cmbSelecionados = st.multiselect('',
                 df_tipos_statusvirtua,
                 df_configuracao["ConfValor"],
                 placeholder='Selecione...')
+            chkTodoAno = st.checkbox(f"Configurar para todos os meses de {gAno}")
+            
             if st.button("Salvar Configurações", type="secondary"):
                 objConfig = ent.Configuracao()
-                df_configuracaoResultado = objConfig.criarDFStatus(gContratante, gAno, gMes, selecionados)
+                df_configuracaoResultado = objConfig.criarDFStatus(gContratante, gAno, gMes, cmbSelecionados, chkTodoAno)
                 if dbConfiguracao.importar(df_configuracaoResultado):
                     st.success("Configurações salvas com sucesso")
                 else:

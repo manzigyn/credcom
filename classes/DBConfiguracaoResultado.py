@@ -31,20 +31,21 @@ class DBConfiguracaoResultado(db.DbMysql):
         try:            
             contratante = df["ConfContratante"].unique()
             ano = df["ConfAno"].unique()
-            mes = df["ConfMes"].unique()
+            meses = df["ConfMes"].unique()
             chaves = df["ConfChave"].unique()
             
             conn = self.connect()
             cursor = conn.cursor()
-            for chave in chaves:                      
-                sql_delete = """
-                    DELETE FROM TBConfiguracaoResultado
-                    WHERE ConfContratante = %s
-                    and ConfAno = %s
-                    and ConfMes = %s
-                    and ConfChave = %s
-                """
-                cursor.execute(sql_delete, (contratante[0], int(ano[0]), int(mes[0]),chave, ))
+            for mes in meses:
+                for chave in chaves:                      
+                    sql_delete = """
+                        DELETE FROM TBConfiguracaoResultado
+                        WHERE ConfContratante = %s
+                        and ConfAno = %s
+                        and ConfMes = %s
+                        and ConfChave = %s
+                    """
+                    cursor.execute(sql_delete, (contratante[0], int(ano[0]), int(mes),chave, ))
                 
             conn.commit()                        
             return self.importarDf(df, 'tbconfiguracaoresultado','DBConfiguracaoResultado->importar')

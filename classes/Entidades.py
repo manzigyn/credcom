@@ -121,15 +121,22 @@ class Distribuicao():
 
 @dataclass
 class Configuracao():
-    def criarDFStatus(self, contratante, ano, mes, df_status):
-        df_saida = pd.DataFrame(columns=['ConfContratante','ConfAno','ConfMes','ConfChave','ConfValor'])
-        df_saida["ConfValor"] = df_status
-        df_saida["ConfContratante"] = contratante
-        df_saida["ConfAno"] = int(ano)
-        df_saida["ConfMes"] = int(mes)
-        df_saida["ConfChave"]='status'
-        
-        return df_saida
+    def criarDFStatus(self, contratante, ano, mes, df_status, todoAno=False):
+        inicio = mes
+        fim = mes
+        if todoAno:
+            inicio =1
+            fim = 12
+        df_result = pd.DataFrame(columns=['ConfContratante','ConfAno','ConfMes','ConfChave','ConfValor'])            
+        for mes_corrente in range(inicio, fim+1):
+            df_saida = pd.DataFrame(columns=['ConfContratante','ConfAno','ConfMes','ConfChave','ConfValor'])
+            df_saida["ConfValor"] = df_status
+            df_saida["ConfContratante"] = contratante
+            df_saida["ConfAno"] = int(ano)
+            df_saida["ConfMes"] = int(mes_corrente)
+            df_saida["ConfChave"]='status'
+            df_result = pd.concat([df_result, df_saida], ignore_index=True)
+        return df_result
     
     def criarDFQuantidade(self, contratante, ano, mes, nSms, nLigacao):
         dados = {'ConfContratante': [contratante, contratante],
