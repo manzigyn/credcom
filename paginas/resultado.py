@@ -89,7 +89,7 @@ if gContratante != 'Selecione...':
             
             #Tabela
             df_loteamento_caixa.loc[len(df_loteamento_caixa)] = row_df
-            r_ap1[0].container(height=altura+80).dataframe(df_loteamento_caixa[["Loteamento","Valor em Caixa"]], hide_index=True)            
+            r_ap1[0].container(height=altura+80).dataframe(df_loteamento_caixa[["Loteamento","Valor em Caixa"]], hide_index=True, width=altura+80)            
             #r_ap1[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_caixa_total)}')
 
 
@@ -110,7 +110,7 @@ if gContratante != 'Selecione...':
                 r_ap2[1].container(height=altura+80).plotly_chart(fig_loteamento_recuperado, use_container_with=True)                
                 #Tabela Loteamento por valor recuperado
                 df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df
-                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True)
+                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True, width=altura+80)
             
             #r_ap2[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_recuperado_total)}')
             
@@ -148,11 +148,11 @@ if gContratante != 'Selecione...':
                 r_ap2[1].container(height=altura+80).plotly_chart(fig_loteamento_recuperado, use_container_with=True)                
                 #Tabela Loteamento por valor recuperado
                 df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df_recuperado
-                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True)
+                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True, width=altura+80)
                 
                 #Tabela Loteamento por valor recuperado
                 df_loteamento_statusvirtua.loc[len(df_loteamento_statusvirtua)] = row_df
-                r_ap4[0].container(height=altura+80).dataframe(df_loteamento_statusvirtua[["Loteamento","Qtde","Valor de Inadimplência","% Recuperada"]], hide_index=True)
+                r_ap4[0].container(height=altura+80).dataframe(df_loteamento_statusvirtua[["Loteamento","Qtde","Valor de Inadimplência","% Recuperada"]], hide_index=True, width=altura+120)
                 #r_ap4[0].info(f'Total Quantidade: {df_loteamento_statusvirtua_totalQtde} Total Valor  {ut.formatarMoedaReal(df_loteamento_statusvirtua_totalValor)}')
             else:
                 r_ap4[0].warning(f"Não há configuração dos status virtua definido para Contratante {gContratante} em {gMes}/{gAno}")            
@@ -161,7 +161,7 @@ if gContratante != 'Selecione...':
             df_statusvirtua_quantidade = dbDistribuicao.consultarStatusVirtuaTotal(gContratante)
             #df_statusvirtua_total = df_statusvirtua["Quantidade"].sum()
             row_df ={"Status" :"Total geral", "Quantidade" : df_statusvirtua_quantidade["Quantidade"].sum()}            
-            r_ap5[0].container(height=altura+80,).dataframe(df_statusvirtua_quantidade[["Status","Quantidade"]], hide_index=True)        
+            r_ap5[0].container(height=altura+80,).dataframe(df_statusvirtua_quantidade[["Status","Quantidade"]], hide_index=True, width=altura+80)        
             #r_ap5[0].info(f'Total geral: {df_statusvirtua_total}')
             #Grafico
             fig_statusvirtua = px.bar(df_statusvirtua_quantidade.sort_values("Quantidade", ascending=True),
