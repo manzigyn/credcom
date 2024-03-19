@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "credcom"
+version = "0.1.0"
+description = ""
+authors = ["Flavio Manzi Alves <manzigyn@gmail.com>"]
+readme = "README.md"
+packages = [{include = "credcom", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.1"
+pandasql = "^0.7.3"
+plotly-express = "^0.4.1"
+streamlit = "^1.32.0"
+streamlit-shadcn-ui = "^0.1.18"
+mysql-connector-python = "^8.3.0"
+st-pages = "^0.4.5"
+openpyxl = "^3.1.2"
+xlsxwriter = "^3.2.0"
+kaleido = "0.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,18 @@
+{
+    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+    // Focalizar para exibir as descrições dos atributos existentes.
+    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug streamlit",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "C:\\Users\\manzi\\AppData\\Local\\pypoetry\\Cache\\virtualenvs\\credcom-dR0Bh2Ad-py3.12\\Scripts\\streamlit.exe",  // /home/xx/tmp/venv/bin/streamlit",
+            "args": [
+                "run",
+                "app.py"
+            ]
+        }
+    ]
+}
