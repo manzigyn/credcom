@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 
 show_pages(
     [
-        Page("paginas/resultado.py", "Resultados", ":chart_with_upwards_trend:")
+        Page("paginas/resultado.py", "Resultados", ":chart_with_upwards_trend:"),
+        Page("paginas/configuracao.py","Configuração",":clipboard:")
     ]
 )
 
