@@ -11,4 +11,4 @@ with st.form(key="frmParametrizacao"):
     btnSalvar = st.form_submit_button("Salvar")
     
     if btnSalvar:
-        st.success("Parametrização salva com sucesso")
+        st.success("Parametrização salva com sucesso!")
