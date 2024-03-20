@@ -30,10 +30,18 @@ class Pagamento():
         df["PagAno"] = df["PagDataPagamentoParcela"].apply((lambda x: str(x.year)))
         df["PagMes"] = df["PagDataPagamentoParcela"].apply((lambda x: int(x.month)))
         #Conversão de valores monetários
-        df['PagValorHonorarioAcordo'] = df['Vlr. Honorário Acordo'].replace("R$","").replace(".","").replace(",",".").replace(" ","").astype(float)
-        df['PagValorTotalAcordo'] = df['Vlr. Total Acordo'].replace("R$","").replace(".","").replace(",",".").replace(" ","").astype(float)
-        df['PagValorParcela'] = df['Valor parcela'].replace("R$","").replace(".","").replace(",",".").replace(" ","").astype(float)
-        df['PagValorRecuperado'] = df['Recuperado'].replace("R$","").replace(".","").replace(",",".").replace(" ","").astype(float)
+        df['PagValorHonorarioAcordo'] = df['Vlr. Honorário Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorHonorarioAcordo'] = df['PagValorHonorarioAcordo'].astype(float)
+        
+        df['PagValorTotalAcordo'] = df['Vlr. Total Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorTotalAcordo'] = df['PagValorTotalAcordo'].astype(float)
+        
+        df['PagValorParcela'] = df['Valor parcela'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorParcela'] = df['PagValorParcela'].astype(float)
+        
+        df['PagValorRecuperado'] = df['Recuperado'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorRecuperado'] = df['PagValorRecuperado'].astype(float)
+        
         df["PagArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo)
         
         df = df.rename(columns={ "Contratante": "PagContratante",
@@ -209,7 +217,7 @@ class DadosArquivoExcel():
         if self.lista_pagamento:
             try:
                 for arquivo in self.lista_pagamento:               
-                        df = pf.lerExcel(arquivo)                         
+                        df = pf.lerExcelTipado(arquivo,{'Vlr. Honorário Acordo': str, 'Vlr. Total Acordo': str, 'Valor parcela': str, 'Recuperado': str})                         
                         objPagamento = ent.Pagamento()
                         df_pagamento = objPagamento.importaDF(df,arquivo)
                         

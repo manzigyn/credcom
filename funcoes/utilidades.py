@@ -91,3 +91,6 @@ def formatarArquivoDataCriacao(arquivo) -> string:
 
 def formatarArquivoDataModificacao(arquivo) -> string:
     return f'{obterNomeArquivo(arquivo)} {obterDataHoraModificacao(arquivo)}'
+
+def tratarMoedaReal(valor: str)-> string:
+    return valor.replace("R$","").replace(",",".").replace(" ","")
