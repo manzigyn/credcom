@@ -30,8 +30,6 @@ gAno = -1
 gMes = -1
 gSms = 0
 gLigacao = 0
-global gArquivoGeradoCaminho
-global gArquivoGeradoNome
 
 st.sidebar.image('img/logo.png')
 if objDadosArquivoExcel.haNovosArquivos():
@@ -240,19 +238,19 @@ if gContratante != 'Selecione...':
                                                             fig_loteamento_caixa)
             excel = objApresentacaoExcel.gerarPeloTemplate()     
             st.sidebar.success("Arquivo gerado com sucesso")      
-            gArquivoGeradoCaminho = objApresentacaoExcel.sArquivoGeradoCaminho
-            gArquivoGeradoNome = objApresentacaoExcel.sArquivoGeradoNome 
+        
+            if objApresentacaoExcel.sArquivoGeradoCaminho:
+                with open(objApresentacaoExcel.sArquivoGeradoCaminho, "rb") as template_file:
+                    template_byte = template_file.read()
+
+                    st.sidebar.download_button(label="Download",
+                                        data=template_byte,
+                                        file_name= objApresentacaoExcel.sArquivoGeradoNome ,
+                                        mime='application/octet-stream')
         except Exception as e:
              st.sidebar.error(f"Falha no geração do arquivo de Apresentação: {e}")
 
-    if gArquivoGeradoCaminho:
-        with open(gArquivoGeradoCaminho, "rb") as template_file:
-            template_byte = template_file.read()
-
-            st.sidebar.download_button(label="Download",
-                                data=template_byte,
-                                file_name=gArquivoGeradoNome,
-                                mime='application/octet-stream')
+    
         
 
        
