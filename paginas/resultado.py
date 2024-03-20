@@ -1,8 +1,8 @@
 import locale
 import streamlit as st
-from classes import DBConfiguracaoResultado as dbConf
-from classes import DBDistribuicao as dbDis
-from classes import DBPagamento as dbPag
+from database import DBConfiguracaoResultado as dbConf
+from database import DBDistribuicao as dbDis
+from database import DBPagamento as dbPag
 from classes import Entidades as ent
 import pandas as pd
 from funcoes import utilidades as ut
@@ -30,7 +30,8 @@ gAno = -1
 gMes = -1
 gSms = 0
 gLigacao = 0
-
+global gArquivoGeradoCaminho
+global gArquivoGeradoNome
 
 st.sidebar.image('img/logo.png')
 if objDadosArquivoExcel.haNovosArquivos():
@@ -225,22 +226,33 @@ if gContratante != 'Selecione...':
             r_da2[0].dataframe(df_dados_distribuicao)
             
     if st.sidebar.button("Gerar Apresentação", disabled=df_loteamento_statusvirtua_aux.empty):
-        objApresentacaoExcel = ent.ApresentacaoExcel(gContratante, 
-                                                     int(gAno), 
-                                                     int(gMes), 
-                                                     df_loteamento_caixa, 
-                                                     df_loteamento_recuperado,
-                                                     df_loteamento_tipo,
-                                                     df_loteamento_statusvirtua,
-                                                     df_statusvirtua_quantidade,
-                                                     int(gSms),
-                                                     int(gLigacao),
-                                                     fig_loteamento_caixa)
         try:
-            objApresentacaoExcel.gerarPeloTemplate()            
-            st.sidebar.success("Arquivo gerado com sucesso")
+            objApresentacaoExcel = ent.ApresentacaoExcel(gContratante, 
+                                                            int(gAno), 
+                                                            int(gMes), 
+                                                            df_loteamento_caixa, 
+                                                            df_loteamento_recuperado,
+                                                            df_loteamento_tipo,
+                                                            df_loteamento_statusvirtua,
+                                                            df_statusvirtua_quantidade,
+                                                            int(gSms),
+                                                            int(gLigacao),
+                                                            fig_loteamento_caixa)
+            excel = objApresentacaoExcel.gerarPeloTemplate()     
+            st.sidebar.success("Arquivo gerado com sucesso")      
+            gArquivoGeradoCaminho = objApresentacaoExcel.sArquivoGeradoCaminho
+            gArquivoGeradoNome = objApresentacaoExcel.sArquivoGeradoNome 
         except Exception as e:
              st.sidebar.error(f"Falha no geração do arquivo de Apresentação: {e}")
+
+    if gArquivoGeradoCaminho:
+        with open(gArquivoGeradoCaminho, "rb") as template_file:
+            template_byte = template_file.read()
+
+            st.sidebar.download_button(label="Download",
+                                data=template_byte,
+                                file_name=gArquivoGeradoNome,
+                                mime='application/octet-stream')
         
 
        

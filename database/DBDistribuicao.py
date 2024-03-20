@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import mysql.connector as my
-from classes import database as db
+from database import DbMysql as db
 
 @dataclass
 class DBDistribuicao(db.DbMysql):

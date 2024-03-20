@@ -5,9 +5,9 @@ from funcoes import utilidades as ut
 import plotly_express as pl
 import os
 from funcoes import pandas_files as pf
-from classes import DBPagamento as dbPgto
-from classes import DBDistribuicao as dbDis
-from classes import DBConfiguracaoResultado as dbConf
+from database import DBPagamento as dbPgto
+from database import DBDistribuicao as dbDis
+from database import DBConfiguracaoResultado as dbConf
 from classes import Entidades as ent
 from io import BytesIO
 import xlsxwriter as xls
@@ -286,7 +286,9 @@ class ApresentacaoExcel:
                  df_statusvirtua_quantidade: pd.DataFrame,
                  iSms: int,
                  iLigacao: int, 
-                 fig_loteamento_caixa: Figure):
+                 fig_loteamento_caixa: Figure, 
+                 sArquivoGeradoNome = '',
+                 sArquivoGeradoCaminho = ''):
         self.sContratante = sContratante
         self.iAno = iAno
         self.iMes = iMes
@@ -298,6 +300,8 @@ class ApresentacaoExcel:
         self.iSms = iSms
         self.iLigacao =iLigacao
         self.fig_loteamento_caixa = fig_loteamento_caixa
+        self.sArquivoGeradoNome = sArquivoGeradoNome
+        self.sArquivoGeradoCaminho = sArquivoGeradoCaminho
     
     
     def gerarArquivo(self) -> pd.ExcelWriter:
@@ -362,7 +366,7 @@ class ApresentacaoExcel:
         return ""
                 
                 
-    def gerarPeloTemplate(self)-> pd.ExcelWriter:
+    def gerarPeloTemplate(self)-> openpyxl.Workbook:
         try:
             pasta = 'dados/'
             origem = f'{pasta}template/'
@@ -370,7 +374,8 @@ class ApresentacaoExcel:
             if not template:
                 return
             arquivo_origem = f'{origem}{template}'
-            arquivo_destino = f'{pasta}apresentacao/{self.sContratante}_{self.iAno}_{self.iMes}.xlsx'
+            self.sArquivoGeradoNome = f'{self.sContratante}_{self.iAno}_{self.iMes}.xlsx'
+            arquivo_destino = f'{pasta}apresentacao/{self.sArquivoGeradoNome}'
             ut.copiarArquivo(arquivo_origem, arquivo_destino )
             
             workbook =  load_workbook(arquivo_destino)
@@ -411,6 +416,7 @@ class ApresentacaoExcel:
             self.write_df_excel(self.df_statusvirtua_quantidade, worksheet, row,2)
             
             workbook.save(arquivo_destino)
+            self.sArquivoGeradoCaminho = arquivo_destino
             return workbook
         except PermissionError as e:
             e.add_note(f'Não foi possível gerar o arquivo {arquivo_destino}, pois deve estar aberto ')

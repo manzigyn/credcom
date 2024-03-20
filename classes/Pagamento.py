@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import mysql.connector as my
-from classes.database import DbMysql
 import pandas as pd
 from funcoes import utilidades as ut
 

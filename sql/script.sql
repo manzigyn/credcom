@@ -136,3 +136,12 @@ CREATE TABLE TbDistribuicaoBkp (
 create index idx_discarteiraBkp on TbDistribuicaoBkp (DisCarteira);
 
 create index idx_disstatusVirtuaBkp on TbDistribuicaoBkp (DisStatusVirtua);
+
+drop table if exists TBParametrizacao;
+
+create table TBParametrizacao(
+	ParChave varchar(300) not null,
+	ParValor varchar(300)  not null
+);
+
+create index idx_parchave on TbParametrizacao (ParChave);

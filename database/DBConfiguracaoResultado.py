@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import mysql.connector as my
-from classes import database as db
+from database import DbMysql as db
 
 
 @dataclass
@@ -51,13 +51,13 @@ class DBConfiguracaoResultado(db.DbMysql):
             return self.importarDf(df, 'tbconfiguracaoresultado','DBConfiguracaoResultado->importar')
             
         except KeyError as e:
-            print(f'DBDistribuicao->importar :{str(e.message)}')
+            print(f'DBConfiguracaoResultado->importar :{str(e.message)}')
             return False
         except my.Error as err:
-            print(f'DBDistribuicao->importar :{str(err)}')
+            print(f'DBConfiguracaoResultado->importar :{str(err)}')
             return False
         except Exception as e:
-            print(f'DBDistribuicao->importar :{str(e)}')
+            print(f'DBConfiguracaoResultado->importar :{str(e)}')
             conn.rollback()
             return False    
         finally:

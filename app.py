@@ -1,5 +1,6 @@
 from st_pages import Page, show_pages, add_page_title
 from sqlalchemy import create_engine
+import streamlit as st
 
 show_pages(
     [
@@ -7,6 +8,7 @@ show_pages(
         Page("paginas/configuracao.py","Configuração",":clipboard:")
     ]
 )
+
 
 #ul.set_png_as_page_bg('img/background.jpeg')  
 
