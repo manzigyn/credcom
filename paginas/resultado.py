@@ -236,17 +236,20 @@ if gContratante != 'Selecione...':
                                                             int(gSms),
                                                             int(gLigacao),
                                                             fig_loteamento_caixa)
-            excel = objApresentacaoExcel.gerarPeloTemplate()     
-            st.sidebar.success("Arquivo gerado com sucesso")      
+            excel = objApresentacaoExcel.gerarPeloTemplate() 
+            if excel :    
+                st.sidebar.success("Arquivo gerado com sucesso")      
         
-            if objApresentacaoExcel.sArquivoGeradoCaminho:
-                with open(objApresentacaoExcel.sArquivoGeradoCaminho, "rb") as template_file:
-                    template_byte = template_file.read()
+                if objApresentacaoExcel.sArquivoGeradoCaminho:
+                    with open(objApresentacaoExcel.sArquivoGeradoCaminho, "rb") as template_file:
+                        template_byte = template_file.read()
 
-                    st.sidebar.download_button(label="Download",
-                                        data=template_byte,
-                                        file_name= objApresentacaoExcel.sArquivoGeradoNome ,
-                                        mime='application/octet-stream')
+                        st.sidebar.download_button(label="Download",
+                                            data=template_byte,
+                                            file_name= objApresentacaoExcel.sArquivoGeradoNome ,
+                                            mime='application/octet-stream')
+            else:
+                st.sidebar.warning("Não foi possível gerar a apresentação devido a falta do template")      
         except Exception as e:
              st.sidebar.error(f"Falha no geração do arquivo de Apresentação: {e}")
 
