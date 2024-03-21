@@ -5,6 +5,8 @@ import base64
 import string
 import streamlit as st
 import time
+import math
+
 
 global MESES_NOME
 MESES_NOME = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -45,6 +47,8 @@ def formatarMoedaReal(valor):
     return 'R$ {:,.2f}'.format(valor).replace(",", "X").replace(".", ",").replace("X", ".")
 
 def formatarPorcentagem(valor):
+    if math.isnan(valor):
+        return "0,00%"
     return '{:,.2f}%'.format(valor).replace(",", "X").replace(".", ",").replace("X", ".")
 
 
@@ -94,3 +98,66 @@ def formatarArquivoDataModificacao(arquivo) -> string:
 
 def tratarMoedaReal(valor: str)-> string:
     return valor.replace("R$","").replace(",",".").replace(" ","")
+
+@st.cache_data
+def get_base64_of_bin_file(png_file):
+    with open(png_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+
+def build_markup_for_logo(
+    png_file,
+    background_position="50% 10%",
+    margin_top="10%",
+    image_width="60%",
+    image_height="",
+    ):
+        binary_string = get_base64_of_bin_file(png_file)
+        return """
+                <style>
+                    [data-testid="stSidebarNav"] {
+                        background-image: url("data:image/png;base64,%s");
+                        background-repeat: no-repeat;
+                        background-position: %s;
+                        margin-top: %s;
+                        background-size: %s %s;
+                    }
+                </style>
+                """ % (
+            binary_string,
+            background_position,
+            margin_top,
+            image_width,
+            image_height,
+        )
+
+
+def add_logo(png_file):
+    logo_markup = build_markup_for_logo(png_file)
+    st.markdown(
+        logo_markup,
+        unsafe_allow_html=True,
+    )
+    
+def add_logo2(imagem):
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebarNav"] {
+                background-image: %s;
+                background-repeat: no-repeat;
+                padding-top: 120px;
+                background-position: 20px 20px;
+            }
+            [data-testid="stSidebarNav"]::before {
+                margin-left: 20px;
+                margin-top: 20px;
+                font-size: 30px;
+                position: relative;
+                top: 100px;
+            }
+        </style>
+        """ % (imagem),
+        unsafe_allow_html=True,
+    )    

@@ -29,5 +29,5 @@ with st.form(key="frmParametrizacao"):
         obj.dir_apresentacao = txt_dir_apresentacao
         objDf = dfPa.DFParametrizacao()
         df = objDf.criarDF(obj)
-        dbParametrizacao.importarDf(df)
+        dbParametrizacao.importar(df)
         st.success("Parametrização salva com sucesso!")

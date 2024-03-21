@@ -15,12 +15,12 @@ class Parametrizacao():
     
     def load(self, lista: List[dto.DTOParametrizacao]):
         for obj in lista:
-            if obj.chave == enPa.EnumParametrizacao.DIR_DADOS:
-                self.dir_dados = obj.chave
-            if obj.chave == enPa.EnumParametrizacao.DIR_PROCESSADOS:
-                self.dir_processados = obj.chave
-            if obj.chave == enPa.EnumParametrizacao.DIR_TEMPLATE:
-                self.dir_template = obj.chave
-            if obj.chave == enPa.EnumParametrizacao.DIR_APRESENTACAO:
-                self.dir_apresentacao = obj.chave
+            if obj.ParChave == enPa.EnumParametrizacao.DIR_DADOS:
+                self.dir_dados = obj.ParChave
+            if obj.ParChave == enPa.EnumParametrizacao.DIR_PROCESSADOS:
+                self.dir_processados = obj.ParChave
+            if obj.ParChave == enPa.EnumParametrizacao.DIR_TEMPLATE:
+                self.dir_template = obj.ParChave
+            if obj.ParChave == enPa.EnumParametrizacao.DIR_APRESENTACAO:
+                self.dir_apresentacao = obj.ParChave
     

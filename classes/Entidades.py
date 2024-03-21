@@ -370,9 +370,10 @@ class ApresentacaoExcel:
         try:
             pasta = 'dados/'
             origem = f'{pasta}template/'
-            template = self.obterTemplate(origem, self.sContratante)
-            if not template:
-                return
+            #template = self.obterTemplate(origem, self.sContratante)            
+            #if not template:
+            #    return
+            template = 'template.xlsx'
             arquivo_origem = f'{origem}{template}'
             self.sArquivoGeradoNome = f'{self.sContratante}_{self.iAno}_{self.iMes}.xlsx'
             arquivo_destino = f'{pasta}apresentacao/{self.sArquivoGeradoNome}'
@@ -381,6 +382,7 @@ class ApresentacaoExcel:
             workbook =  load_workbook(arquivo_destino)
             worksheet= workbook['Apresentação']
             
+            worksheet['B2'] = f'Apresentação de Resultados - {self.sContratante}'
             worksheet['C7'] = self.iSms
             worksheet['C8'] = self.iLigacao
             
