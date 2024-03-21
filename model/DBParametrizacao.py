@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import mysql.connector as my
-from database import DbMysql as db
+from model import DbMysql as db
 
 
 @dataclass

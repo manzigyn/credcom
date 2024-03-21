@@ -133,7 +133,7 @@ def build_markup_for_logo(
         )
 
 
-def add_logo(png_file):
+def adicionar_logo(png_file):
     logo_markup = build_markup_for_logo(png_file)
     st.markdown(
         logo_markup,
@@ -161,3 +161,7 @@ def add_logo2(imagem):
         """ % (imagem),
         unsafe_allow_html=True,
     )    
+    
+def inserirCaracterFinal(valor: str, caracter: str) -> str:
+    return f'{valor}{caracter}' if valor and valor[-1] != caracter else valor
+

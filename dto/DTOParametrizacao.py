@@ -7,5 +7,5 @@ class DTOParametrizacao(dt.DTOBase):
     ParChave: str = ''
     ParValor: str = ''
     
-    def loadDF(self, df: pd.DataFrame):
+    def carregarDF(self, df: pd.DataFrame):
         self.lista = [DTOParametrizacao(**kwargs) for kwargs in df.to_dict(orient='records')]

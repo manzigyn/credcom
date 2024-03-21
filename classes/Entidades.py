@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from matplotlib.figure import Figure
 import pandas as pd
-from funcoes import utilidades as ut
+from utils import utilidades as ut
 import plotly_express as pl
 import os
-from funcoes import pandas_files as pf
-from database import DBPagamento as dbPgto
-from database import DBDistribuicao as dbDis
-from database import DBConfiguracaoResultado as dbConf
+from utils import pandas_files as pf
+from model import DBPagamento as dbPgto
+from model import DBDistribuicao as dbDis
+from model import DBConfiguracaoResultado as dbConf
 from classes import Entidades as ent
 from io import BytesIO
 import xlsxwriter as xls
@@ -376,7 +376,7 @@ class ApresentacaoExcel:
             template = 'template.xlsx'
             arquivo_origem = f'{origem}{template}'
             self.sArquivoGeradoNome = f'{self.sContratante}_{self.iAno}_{self.iMes}.xlsx'
-            arquivo_destino = f'{pasta}apresentacao/{self.sArquivoGeradoNome}'
+            arquivo_destino = f'D:/pessoal/Magalhaes/{self.sArquivoGeradoNome}'
             ut.copiarArquivo(arquivo_origem, arquivo_destino )
             
             workbook =  load_workbook(arquivo_destino)

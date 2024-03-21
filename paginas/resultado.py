@@ -1,11 +1,13 @@
 import locale
 import streamlit as st
-from database import DBConfiguracaoResultado as dbConf
-from database import DBDistribuicao as dbDis
-from database import DBPagamento as dbPag
+from model import DBConfiguracaoResultado as dbConf
+from model import DBDistribuicao as dbDis
+from model import DBPagamento as dbPag
 from classes import Entidades as ent
+from controller import CTLApresentacaoExcel as ctlAp
+from entity import ApresentacaoExcel as entAp
 import pandas as pd
-from funcoes import utilidades as ut
+from utils import utilidades as ut
 import traceback
 import plotly_express as px    
 
@@ -18,7 +20,7 @@ st.set_page_config(
     layout="wide"
 )
 #st.sidebar.image('img/logo.png')
-ut.add_logo('img/logo.png')
+ut.adicionar_logo('img/logo.png')
 
 dbPagamento = dbPag.DBPagamento()
 dbDistribuicao = dbDis.DBDistribuicao()
@@ -227,7 +229,7 @@ if gContratante != 'Selecione...':
             
     if st.sidebar.button("Gerar Apresentação", disabled=df_loteamento_statusvirtua_aux.empty):
         try:
-            objApresentacaoExcel = ent.ApresentacaoExcel(gContratante, 
+            apresentacaoExcel = entAp.ApresentacaoExcel(gContratante, 
                                                             int(gAno), 
                                                             int(gMes), 
                                                             df_loteamento_caixa, 
@@ -238,17 +240,17 @@ if gContratante != 'Selecione...':
                                                             int(gSms),
                                                             int(gLigacao),
                                                             fig_loteamento_caixa)
-            excel = objApresentacaoExcel.gerarPeloTemplate() 
+            excel = ctlAp.CTLApresentacaoExcel(apresentacaoExcel).gerarPeloTemplate() 
             if excel :    
                 st.sidebar.success("Arquivo gerado com sucesso")      
         
-                if objApresentacaoExcel.sArquivoGeradoCaminho:
-                    with open(objApresentacaoExcel.sArquivoGeradoCaminho, "rb") as template_file:
+                if apresentacaoExcel.CaminhoArquivo:
+                    with open(apresentacaoExcel.CaminhoArquivo, "rb") as template_file:
                         template_byte = template_file.read()
 
                         st.sidebar.download_button(label="Download",
                                             data=template_byte,
-                                            file_name= objApresentacaoExcel.sArquivoGeradoNome ,
+                                            file_name= apresentacaoExcel.NomeArquivo ,
                                             mime='application/octet-stream')
             else:
                 st.sidebar.warning("Não foi possível gerar a apresentação devido a falta do template")      

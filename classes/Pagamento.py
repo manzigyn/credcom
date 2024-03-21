@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import mysql.connector as my
 import pandas as pd
-from funcoes import utilidades as ut
+from utils import utilidades as ut
 
 @dataclass
 class Pagamento():
