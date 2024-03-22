@@ -145,3 +145,20 @@ create table TBParametrizacao(
 );
 
 create index idx_parchave on TbParametrizacao (ParChave);
+
+drop table if exists TbLogGeracao;
+
+CREATE TABLE TbLogGeracao (
+	GerAno int not null,
+	GerMes int not null,
+	GerContratante VARCHAR(100) not null,
+	GerOperador VARCHAR(100) not null,
+	GerData VARCHAR(8) not null,
+	GerHorario VARCHAR(8) not null,
+	GerArquivo VARCHAR(100) not null
+);
+create index idx_geranoBkp on TbLogGeracao (GerAno);
+
+create index idx_germesBkp on TbLogGeracao (GerMes);
+
+create index idx_gercontranteBkp on TbLogGeracao (GerContratante);
