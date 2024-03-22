@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 import mysql.connector as my
 from model import DbMysql as db
+import pandas as pd
+from enums import EnumConfiguracaoResultado as enConfig
+from entity import Contratante as entCont
 
 @dataclass
 class DBDistribuicao(db.DbMysql):
-    def importar(self, df):
+    def salvar(self, df) -> bool:
         try:
             carteira = df["DisCarteira"].unique()
             
@@ -57,7 +60,7 @@ class DBDistribuicao(db.DbMysql):
                 
    
             
-    def consultarLoteamentoValorTotal(self, contratante, ano, mes):
+    def consultarLoteamentoValorTotal(self, contratante: entCont.Contratante) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -74,13 +77,13 @@ class DBDistribuicao(db.DbMysql):
                     where c.ConfContratante = d.DisCarteira
                     and c.ConfAno = %s
                     and c.ConfMes = %s
-                    and c.ConfChave = 'status'
+                    and c.ConfChave = %s
                     and c.ConfValor = d.DisStatusVirtua
                     )
                 group by d.DisLoteamentoCursoLuc
                 order by 1
             """
-            cursor.execute(sql, (contratante, int(ano), int(mes),))
+            cursor.execute(sql, (contratante.nome, int(contratante.ano), int(contratante.mes), enConfig.EnumConfiguracaoResultado.STATUS, ))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
@@ -88,7 +91,7 @@ class DBDistribuicao(db.DbMysql):
                 conn.close()
     
             
-    def consultarStatusVirtuaTotal(self, contratante):
+    def consultarStatusVirtuaTotal(self, nome) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -102,7 +105,7 @@ class DBDistribuicao(db.DbMysql):
                 group by DisStatusVirtua
                 order by 2 desc
             """
-            cursor.execute(sql, (contratante,))
+            cursor.execute(sql, (nome,))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
@@ -110,7 +113,7 @@ class DBDistribuicao(db.DbMysql):
                 conn.close()
 
             
-    def consultarContratante(self, contratante):
+    def consultarContratante(self, nome) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -121,14 +124,14 @@ class DBDistribuicao(db.DbMysql):
                 where DisCarteira = %s
                 order by 1
             """
-            cursor.execute(sql, (contratante, ))
+            cursor.execute(sql, (nome, ))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
             if conn:
                 conn.close()
                 
-    def consultarStatusVirtuaDistintos(self, contratante):
+    def consultarStatusVirtuaDistintos(self, nome) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -140,7 +143,7 @@ class DBDistribuicao(db.DbMysql):
                 where DisCarteira = %s
                 order by 1
             """
-            cursor.execute(sql, (contratante, ))
+            cursor.execute(sql, (nome, ))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:

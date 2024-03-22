@@ -16,7 +16,7 @@ def carregar() -> en.Parametrizacao:
 
 def salvar(entidade: en.Parametrizacao):
     df = dfPa.DFParametrizacao().criarDF(entidade)
-    db.DBParametrizacao().importar(df)
+    db.DBParametrizacao().salvar(df)
     
 def validarPermissaoEscrita(diretorio: str) -> bool:
     if not os.path.isdir(diretorio):

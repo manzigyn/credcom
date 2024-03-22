@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 import mysql.connector as my
 from model import DbMysql as db
-
+import pandas as pd
+from entity import Contratante as entCont
 
 @dataclass
 class DBPagamento(db.DbMysql):
-    def importar(self, df):
+    def salvar(self, df) -> bool:
         
         try:
             contratante = df["PagContratante"].unique()
@@ -79,7 +80,7 @@ class DBPagamento(db.DbMysql):
             
         
         
-    def consultarLoteamentoValorPago(self, contratante, ano, mes):
+    def consultarLoteamentoValorPago(self, contratante: entCont.Contratante) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -95,14 +96,14 @@ class DBPagamento(db.DbMysql):
                 group by PagEmpreendimento
                 order by 1
             """
-            cursor.execute(sql, (contratante, int(ano), int(mes),))
+            cursor.execute(sql, (contratante.nome, int(contratante.ano), int(contratante.mes),))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
             if conn :
                 conn.close()
             
-    def consultarLoteamentoValorRecuperado(self, contratante, ano, mes):
+    def consultarLoteamentoValorRecuperado(self, contratante: entCont.Contratante) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -118,7 +119,7 @@ class DBPagamento(db.DbMysql):
                 group by PagEmpreendimento
                 order by 1
             """
-            cursor.execute(sql, (contratante, int(ano), int(mes),))
+            cursor.execute(sql, (contratante.nome, int(contratante.ano), int(contratante.mes),))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
@@ -126,7 +127,7 @@ class DBPagamento(db.DbMysql):
                 conn.close()
             
 
-    def consultarTipoNegociacao(self, contratante, ano, mes):
+    def consultarTipoNegociacao(self, contratante: entCont.Contratante) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -144,7 +145,7 @@ class DBPagamento(db.DbMysql):
                 group by PagTipoNegociacao
                 order by 1
             """
-            cursor.execute(sql, (contratante, int(ano), int(mes),))
+            cursor.execute(sql, (contratante.nome, int(contratante.ano), int(contratante.mes),))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:
@@ -152,7 +153,7 @@ class DBPagamento(db.DbMysql):
                 conn.close()
             
 
-    def consultarContratanteDistinto(self):
+    def consultarContratanteDistinto(self)-> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -172,7 +173,7 @@ class DBPagamento(db.DbMysql):
             
         
                         
-    def consultarContratante(self, contratante):
+    def consultarContratante(self, nome):
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -183,7 +184,7 @@ class DBPagamento(db.DbMysql):
                 where PagContratante = %s
                 order by 1
             """
-            cursor.execute(sql, (contratante, ))
+            cursor.execute(sql, (nome, ))
             results = cursor.fetchall()
             return self.exportDataFrame(cursor, results)
         finally:

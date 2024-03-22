@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 import mysql.connector as my
 from model import DbMysql as db
-
+from entity import Contratante as entCon
+import pandas as pd
 
 @dataclass
 class DBConfiguracaoResultado(db.DbMysql):
-    def consultar(self, contratante, ano, mes):
+    def consultar(self, contratante: entCon.Contratante) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -16,7 +17,7 @@ class DBConfiguracaoResultado(db.DbMysql):
                 and ConfAno = %s
                 and ConfMes = %s
             """
-            cursor.execute(sql, (contratante, int(ano), int(mes),))
+            cursor.execute(sql, (contratante.nome, int(contratante.ano), int(contratante.mes),))
             results = cursor.fetchall()
             return  self.exportDataFrame(cursor, results)
         finally:
@@ -27,7 +28,7 @@ class DBConfiguracaoResultado(db.DbMysql):
     def consultarPadrao(self):
         return self.consultar('padrao',-1,-1)
             
-    def importar(self, df):
+    def salvar(self, df) -> bool:
         try:            
             contratante = df["ConfContratante"].unique()
             ano = df["ConfAno"].unique()

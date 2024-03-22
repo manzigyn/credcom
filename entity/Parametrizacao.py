@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import TypedDict
 import pandas as pd
 from dto import DTOParametrizacao as dto
 from enums import EnumParametrizacao as enPa

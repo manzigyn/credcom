@@ -1,11 +1,16 @@
 import locale
 import streamlit as st
-from model import DBConfiguracaoResultado as dbConf
-from model import DBDistribuicao as dbDis
-from model import DBPagamento as dbPag
-from classes import Entidades as ent
+from controller import CTLDadosArquivoExcel as ctlArqExc
 from controller import CTLApresentacaoExcel as ctlAp
+from controller import CTLConfiguracaoResultado
+from controller import CTLApresentacaoResultado
+from controller import CTLPagamento 
+from controller import CTLDistribuicao
 from entity import ApresentacaoExcel as entAp
+from entity import Contratante as entCont
+from entity import ConfiguracaoResultado as entConfig
+from entity import ApresentacaoResultado as entApre
+from view import ViewLoteamentoCaixa as vwLotCaixa
 import pandas as pd
 from utils import utilidades as ut
 import traceback
@@ -22,45 +27,38 @@ st.set_page_config(
 #st.sidebar.image('img/logo.png')
 ut.adicionar_logo('img/logo.png')
 
-dbPagamento = dbPag.DBPagamento()
-dbDistribuicao = dbDis.DBDistribuicao()
-dbConfiguracao = dbConf.DBConfiguracaoResultado()
-#entApresentacao = ent.Apresentacao()
-objDadosArquivoExcel = ent.DadosArquivoExcel()
+ctlDadosArquivoExcel = ctlArqExc.DadosArquivoExcel()
+entContratante = entCont.Contratante()
+entConfiguracaoResultado = entConfig.ConfiguracaoResultado()
+entApresentacaoResultado = entApre.ApresentacaoResultado()
+viewLoteamentoCaixa = vwLotCaixa.ViewLoteamentoCaixa()
 
-df_contratante = dbPagamento.consultarContratanteDistinto()
-gAno = -1
-gMes = -1
-gSms = 0
-gLigacao = 0
+df_contratante = CTLPagamento.consultarContratantesDistintos()
 
-
-if objDadosArquivoExcel.haNovosArquivos():
-    st.warning(f'Pagamento {len(objDadosArquivoExcel.lista_pagamento)} Distribuição: {len(objDadosArquivoExcel.lista_distribuicao)}')
+if ctlDadosArquivoExcel.haNovosArquivos():
+    st.warning(f'Pagamento {len(ctlDadosArquivoExcel.lista_pagamento)} Distribuição: {len(ctlDadosArquivoExcel.lista_distribuicao)}')
     if st.button('Atualizar Arquivos',type='primary'):
         try:
-            objDadosArquivoExcel.processarArquivos()
+            ctlDadosArquivoExcel.processarArquivos()
             st.success("Arquivos atualizados com sucesso")
         except Exception as e:
             mensagem = traceback.format_exc()
             with st.expander('Falha no processamento do arquivo'):
                 st.markdown(mensagem)
     
-gContratante = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(df_contratante["Contratante"].unique()))
+entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(df_contratante["Contratante"].unique()))
+ 
 
-label = f'Apresentação de Resultados - {gContratante}'
+label = f'Apresentação de Resultados - {entContratante.nome}'
 s = f"<p style='font-size:30px; font-weight: bold'>{label}</p>"
 st.markdown(s, unsafe_allow_html=True)
 
 
 tab_apresentacao, tab_configuracao, tab_dados  = st.tabs([":moneybag: Apresentação",":mailbox_with_mail: Configuração", ":books: Dados"])
-if gContratante != 'Selecione...':    
-    df_dados_pagamento = dbPagamento.consultarContratante(gContratante)
-    df_dados_distribuicao = dbDistribuicao.consultarContratante(gContratante)
-    
-    df_filtro = df_dados_pagamento[df_dados_pagamento['PagContratante'] == gContratante]
-    gAno = st.sidebar.selectbox("Ano", df_dados_pagamento['PagAno'].unique())
-    gMes = st.sidebar.selectbox("Mês", df_dados_pagamento['PagMes'].unique())
+if entContratante.nome != 'Selecione...':    
+    entApresentacaoResultado = CTLApresentacaoResultado.obter(entContratante)
+    entContratante.ano = st.sidebar.selectbox("Ano", entApresentacaoResultado.anos)
+    entContratante.mes = st.sidebar.selectbox("Mês", entApresentacaoResultado.meses)
 
     with st.container():
         with tab_apresentacao:
@@ -72,31 +70,11 @@ if gContratante != 'Selecione...':
             altura = 380
             
             #Loteamento por Caixa            
-            df_loteamento_caixa = dbPagamento.consultarLoteamentoValorPago(gContratante, gAno, gMes)
-            #colwidth = df_loteamento_caixa["Loteamento"].str.len().max()
-            #pd.set_option('max_colwidth', int(colwidth))
-            df_loteamento_caixa["Valor em Caixa"] = df_loteamento_caixa["Total"].apply(lambda x: ut.formatarMoedaReal(x))            
-            row_df ={"Loteamento" :"Total geral", "Valor em Caixa" : ut.formatarMoedaReal(df_loteamento_caixa["Total"].sum())}            
-                        
-            fig_loteamento_caixa = px.pie(df_loteamento_caixa, values='Total', names='Loteamento',
-                                          labels={"Total":"Valor em Caixa"},
-                                        title='Loteamento por Valor em Caixa', opacity=0.80)
-            fig_loteamento_caixa.update_traces(textinfo='percent')
-            
-            
-            #df_loteamento_caixa = df_loteamento_caixa.drop("Total", axis=1)
-            
-            #Grafico
-            r_ap1[1].container(height=altura+80).plotly_chart(fig_loteamento_caixa, use_container_with=True)
-            
-            #Tabela
-            df_loteamento_caixa.loc[len(df_loteamento_caixa)] = row_df
-            r_ap1[0].container(height=altura+80).dataframe(df_loteamento_caixa[["Loteamento","Valor em Caixa"]], hide_index=True, use_container_width=True )            
-            #r_ap1[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_caixa_total)}')
+            viewLoteamentoCaixa.criar(entContratante, r_ap1, altura)
 
 
             #Loteamento por valor recuperado
-            df_loteamento_recuperado = dbPagamento.consultarLoteamentoValorRecuperado(gContratante, gAno, gMes)
+            df_loteamento_recuperado = CTLPagamento.consultarLoteamentoValorRecuperado(entContratante)
             df_loteamento_recuperado["Valor Recuperado"] = df_loteamento_recuperado["Total"].apply(lambda x: ut.formatarMoedaReal(x))            
             row_df_recuperado ={"Loteamento" :"Total geral", "Valor Recuperado" : ut.formatarMoedaReal(df_loteamento_recuperado["Total"].sum())}            
             
@@ -105,19 +83,19 @@ if gContratante != 'Selecione...':
                                         title='Loteamento por Valor Recuperado', opacity=0.80)
             fig_loteamento_recuperado.update_traces(textinfo='percent')
             
-            df_loteamento_statusvirtua_aux = dbDistribuicao.consultarLoteamentoValorTotal(gContratante, gAno, gMes)
+            df_loteamento_statusvirtua_aux = CTLDistribuicao.consultarLoteamentoValorTotal(entContratante)
             if df_loteamento_statusvirtua_aux.empty:
                 #df_loteamento_recuperado = df_loteamento_recuperado.drop("Total", axis=1)            
                 #Grafico Loteamento por valor recuperado
                 r_ap2[1].container(height=altura+80).plotly_chart(fig_loteamento_recuperado, use_container_with=True)                
                 #Tabela Loteamento por valor recuperado
-                df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df
+                df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df_recuperado
                 r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True, use_container_width=True)
             
             #r_ap2[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_recuperado_total)}')
             
             #Loteamento por tipo de negociação
-            df_loteamento_tipo = dbPagamento.consultarTipoNegociacao(gContratante, gAno, gMes)
+            df_loteamento_tipo = CTLPagamento.consultarTipoNegociacao(entContratante)
             df_loteamento_tipo["Valor Recuperado"] = df_loteamento_tipo["Total"].apply(lambda x: ut.formatarMoedaReal(x))
             #df_loteamento_tipo_total = df_loteamento_tipo["Total"].sum()
             #df_loteamento_tipo_quantidade_total = df_loteamento_tipo["Qtde"].sum()
@@ -158,10 +136,10 @@ if gContratante != 'Selecione...':
                 r_ap3[1].container(height=altura+80).dataframe(df_loteamento_statusvirtua[["Loteamento","Qtde","Valor de Inadimplência","% Recuperada"]], hide_index=True, use_container_width=True)
                 #r_ap4[0].info(f'Total Quantidade: {df_loteamento_statusvirtua_totalQtde} Total Valor  {ut.formatarMoedaReal(df_loteamento_statusvirtua_totalValor)}')
             else:
-                r_ap3[1].warning(f"Não há configuração dos status virtua definido para Contratante {gContratante} em {gMes}/{gAno}")              
+                r_ap3[1].warning(f"Não há configuração dos status virtua definido para Contratante {entContratante} em {entContratante.mes}/{entContratante.ano}")              
            
             #Status virtua por total
-            df_statusvirtua_quantidade = dbDistribuicao.consultarStatusVirtuaTotal(gContratante)
+            df_statusvirtua_quantidade = CTLDistribuicao.consultarStatusVirtuaTotal(entContratante)
             #df_statusvirtua_total = df_statusvirtua["Quantidade"].sum()
             row_df ={"Status" :"Total geral", "Quantidade" : df_statusvirtua_quantidade["Quantidade"].sum()}            
             df_statusvirtua_quantidade.loc[len(df_statusvirtua_quantidade)] = row_df
@@ -182,36 +160,36 @@ if gContratante != 'Selecione...':
         
 
         with tab_configuracao:
-            st.write(f"Selecione os Status Virtua para referente ao período {gMes}/{gAno}")
-            df_tipos_statusvirtua = dbDistribuicao.consultarStatusVirtuaDistintos(gContratante)
-            df_configuracoes = dbConfiguracao.consultar(gContratante, gAno, gMes)
-            df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == "status"]
+            st.write(f"Selecione os Status Virtua para referente ao período {entContratante.mes}/{entContratante.ano}")
+            #df_tipos_statusvirtua = dbDistribuicao.consultarStatusVirtuaDistintos(gContratante)
+            #df_configuracoes = dbConfiguracao.consultar(gContratante, gAno, gMes)
+            #df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == "status"]
+            #cmbSelecionados = st.multiselect('',
+            #    df_tipos_statusvirtua,
+            #    df_configuracao["ConfValor"],
+            #    placeholder='Selecione...')
+            entConfiguracaoResultado = CTLConfiguracaoResultado.obter(entContratante)
             cmbSelecionados = st.multiselect('',
-                df_tipos_statusvirtua,
-                df_configuracao["ConfValor"],
+                entConfiguracaoResultado.statusVirtua,
+                entConfiguracaoResultado.status,
                 placeholder='Selecione...')
-            chkTodoAno = st.checkbox(f"Configurar para todos os meses de {gAno}")
+            chkTodoAno = st.checkbox(f"Configurar para todos os meses de {entContratante.ano}")
             
             if st.button("Salvar Configurações", type="secondary"):
-                objConfig = ent.Configuracao()
-                df_configuracaoResultado = objConfig.criarDFStatus(gContratante, gAno, gMes, cmbSelecionados, chkTodoAno)
-                if dbConfiguracao.importar(df_configuracaoResultado):
+                entConfiguracaoResultado.status = cmbSelecionados
+                if CTLConfiguracaoResultado.salvarStatus(entConfiguracaoResultado, chkTodoAno):
                     st.success("Configurações salvas com sucesso")
                 else:
                     st.error("Falha ao Salvar as Configurações")
-            df_aux = df_configuracoes[df_configuracoes["ConfChave"] == "sms"]                    
-            gSms = int(0) if df_aux.empty else df_aux["ConfValor"].unique()
 
-            gSms = st.number_input("Quantidade de SMS", value=int(gSms), placeholder="Informe a quantidade...")        
-            
-            df_aux = df_configuracoes[df_configuracoes["ConfChave"] == "ligacao"]
-            gLigacao= int(0) if df_aux.empty else df_aux["ConfValor"].unique()
-            gLigacao = st.number_input("Quantidade de Ligações", value=int(gLigacao), placeholder="Informe a quantidade...")        
+
+            sms = st.number_input("Quantidade de SMS", value=entConfiguracaoResultado.sms, placeholder="Informe a quantidade...")                    
+            ligacao = st.number_input("Quantidade de Ligações", value=entConfiguracaoResultado.ligacao, placeholder="Informe a quantidade...")        
             
             if st.button("Salvar Quantidade", type="secondary"):
-                objConfig = ent.Configuracao()
-                df_configuracaoResultado = objConfig.criarDFQuantidade(gContratante, gAno, gMes, gSms, gLigacao)
-                if dbConfiguracao.importar(df_configuracaoResultado):
+                entConfiguracaoResultado.sms = sms
+                entConfiguracaoResultado.ligacao = ligacao
+                if CTLConfiguracaoResultado.salvarQuantidade(entConfiguracaoResultado):
                     st.success("Quantidades salvas com sucesso")
                 else:
                     st.error("Falha ao Salvar os dados de quantidade")
@@ -223,23 +201,19 @@ if gContratante != 'Selecione...':
             r_da2 = st.columns(1)
             
             r_da1[0].write("Dados de Pagamento")
-            r_da1[0].dataframe(df_dados_pagamento)
+            r_da1[0].dataframe(CTLPagamento.apresentarDFOriginal(entApresentacaoResultado.df_pagamento))
             r_da2[0].write("Dados de Distribuição")
-            r_da2[0].dataframe(df_dados_distribuicao)
+            r_da2[0].dataframe(CTLDistribuicao.apresentarDFOriginal(entApresentacaoResultado.df_distribuicao))
             
     if st.sidebar.button("Gerar Apresentação", disabled=df_loteamento_statusvirtua_aux.empty):
         try:
-            apresentacaoExcel = entAp.ApresentacaoExcel(gContratante, 
-                                                            int(gAno), 
-                                                            int(gMes), 
-                                                            df_loteamento_caixa, 
+            apresentacaoExcel = entAp.ApresentacaoExcel(entConfiguracaoResultado,
+                                                            viewLoteamentoCaixa, 
                                                             df_loteamento_recuperado,
                                                             df_loteamento_tipo,
                                                             df_loteamento_statusvirtua,
-                                                            df_statusvirtua_quantidade,
-                                                            int(gSms),
-                                                            int(gLigacao),
-                                                            fig_loteamento_caixa)
+                                                            df_statusvirtua_quantidade
+                                                            )
             excel = ctlAp.CTLApresentacaoExcel(apresentacaoExcel).gerarPeloTemplate() 
             if excel :    
                 st.sidebar.success("Arquivo gerado com sucesso")      

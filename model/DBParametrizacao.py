@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 import mysql.connector as my
 from model import DbMysql as db
-
+import pandas as pd
 
 @dataclass
 class DBParametrizacao(db.DbMysql):
-    def consultar(self, chave):
+    def consultar(self, chave) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -21,7 +21,7 @@ class DBParametrizacao(db.DbMysql):
             if conn:
                 conn.close()
                 
-    def consultarTodos(self):
+    def consultarTodos(self) -> pd.DataFrame:
         try:
             conn = self.connect()
             cursor = conn.cursor()
@@ -36,7 +36,7 @@ class DBParametrizacao(db.DbMysql):
             if conn:
                 conn.close()    
                 
-    def importar(self, df):
+    def salvar(self, df) -> bool:
         try:            
             chaves = df["ParChave"].unique()
             

@@ -57,11 +57,11 @@ class DbMysql:
         finally:
             conn.close()
             
-    def exportDataFrame(self, cursor, rows):
+    def exportDataFrame(self, cursor, rows) -> pd.DataFrame:
         names = [ x[0] for x in cursor.description]
         return pd.DataFrame(rows, columns=names)
     
-    def importarDf(self, df, table, messageError):
+    def importarDf(self, df, table, messageError) -> bool:
         try:
             dbEngine = self.connect_engine()
             #with dbEngine.begin() as conn2:
