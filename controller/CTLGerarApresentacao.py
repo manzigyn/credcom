@@ -1,5 +1,6 @@
 import pandas as pd
 from controller import CTLParametrizacao
+from controller import CTLLogGeracao
 from utils import utilidades as ut
 from entity import ApresentacaoExcel as enAp
 from openpyxl import load_workbook
@@ -7,7 +8,7 @@ from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 import openpyxl
 import os
-
+from datetime import datetime
 
 class CTLApresentacaoExcel:
     
@@ -15,6 +16,8 @@ class CTLApresentacaoExcel:
         self.parametrizacao = CTLParametrizacao.carregar()
         self.apresentacaoExcel = entidade
     
+    def haCarga(self) -> bool:
+        return self.parametrizacao.haCarga
 
     def obterTemplate(self, pasta_origem,  chave):
         for arquivo in os.listdir(pasta_origem):
@@ -29,16 +32,16 @@ class CTLApresentacaoExcel:
         try:
 
             arquivo_origem = f'{self.parametrizacao.dir_template}template.xlsx'
-            self.apresentacaoExcel.NomeArquivo = f'{self.apresentacaoExcel.Contratante}_{self.apresentacaoExcel.Ano}_{self.apresentacaoExcel.Mes}.xlsx'
-            arquivo_destino = f'{self.parametrizacao.dir_apresentacao}{self.apresentacaoExcel.NomeArquivo}'
+            self.apresentacaoExcel.nomeArquivo = f'{self.apresentacaoExcel.contratante.nome}_{self.apresentacaoExcel.contratante.ano}_{self.apresentacaoExcel.contratante.mes}_{datetime.today().strftime('%Y%m%d')}_{datetime.today().strftime('%H%M%S')}.xlsx'
+            arquivo_destino = f'{self.parametrizacao.dir_apresentacao}{self.apresentacaoExcel.nomeArquivo}'
             ut.copiarArquivo(arquivo_origem, arquivo_destino )
             
             workbook =  load_workbook(arquivo_destino)
             worksheet= workbook['Apresentação']
             
-            worksheet['B2'] = f'Apresentação de Resultados - {self.apresentacaoExcel.Contratante}'
-            worksheet['C7'] = self.apresentacaoExcel.Sms
-            worksheet['C8'] = self.apresentacaoExcel.Ligacao
+            worksheet['B2'] = f'Apresentação de Resultados - {self.apresentacaoExcel.contratante.nome}'
+            worksheet['C7'] = self.apresentacaoExcel.sms
+            worksheet['C8'] = self.apresentacaoExcel.ligacao
             
             row =11
             linha_formula = row+len(self.apresentacaoExcel.df_loteamento_caixa.index)
@@ -72,7 +75,8 @@ class CTLApresentacaoExcel:
             self.write_df_excel(self.apresentacaoExcel.df_statusvirtua_quantidade, worksheet, row,2)
             
             workbook.save(arquivo_destino)
-            self.apresentacaoExcel.CaminhoArquivo = arquivo_destino
+            self.apresentacaoExcel.caminhoArquivo = arquivo_destino
+            CTLLogGeracao.salvar(self.apresentacaoExcel.contratante, self.apresentacaoExcel.nomeArquivo, self.apresentacaoExcel.caminhoArquivo)
             return workbook
         except PermissionError as e:
             e.add_note(f'Não foi possível gerar o arquivo {arquivo_destino}, pois deve estar aberto ')

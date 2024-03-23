@@ -30,3 +30,8 @@ class Parametrizacao():
             if obj.ParChave == enPa.EnumParametrizacao.DIR_APRESENTACAO:
                 self.dir_apresentacao = obj.ParValor
     
+    def haCarga(self) -> bool:
+        return self.dir_dados and self.dir_processados
+    
+    def haGeracao(self) -> bool:
+        return self.dir_template and self.dir_apresentacao

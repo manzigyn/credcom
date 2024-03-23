@@ -7,3 +7,4 @@ from matplotlib.figure import Figure
 class ApresentacaoView():
     df_tabela: pd.DataFrame = field(default_factory = pd.DataFrame)
     grafico: Figure = field(default_factory = Figure)
+    df_tabela_aux: pd.DataFrame = field(default_factory = pd.DataFrame)

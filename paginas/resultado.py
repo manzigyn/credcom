@@ -1,20 +1,22 @@
 import locale
 import streamlit as st
-from controller import CTLDadosArquivoExcel as ctlArqExc
-from controller import CTLApresentacaoExcel as ctlAp
-from controller import CTLConfiguracaoResultado
 from controller import CTLApresentacaoResultado
 from controller import CTLPagamento 
 from controller import CTLDistribuicao
+from controller import CTLParametrizacao
 from entity import ApresentacaoExcel as entAp
 from entity import Contratante as entCont
 from entity import ConfiguracaoResultado as entConfig
 from entity import ApresentacaoResultado as entApre
 from view import ViewLoteamentoCaixa as vwLotCaixa
-import pandas as pd
+from view import ViewLoteamentoRecuperado as vwLotRecup
+from view import ViewLoteamentoTipo as vwLotTipo
+from view import ViewLoteamentoStatusVirtua as vwLotVirtua
+from view import ViewStatusVirtuaQuantidade as vwSta
+from view import ViewImportarArquivoExcel as vwArqExcel
+from view import ViewGerarApresentacao as vwGerApre
+from view import ViewConfiguracao as vwConfig
 from utils import utilidades as ut
-import traceback
-import plotly_express as px    
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 #pd.options.display.float_format = 'R${:, .2f}'.format
@@ -27,25 +29,25 @@ st.set_page_config(
 #st.sidebar.image('img/logo.png')
 ut.adicionar_logo('img/logo.png')
 
-ctlDadosArquivoExcel = ctlArqExc.DadosArquivoExcel()
+
 entContratante = entCont.Contratante()
 entConfiguracaoResultado = entConfig.ConfiguracaoResultado()
 entApresentacaoResultado = entApre.ApresentacaoResultado()
 viewLoteamentoCaixa = vwLotCaixa.ViewLoteamentoCaixa()
+viewLoteamentoRecuperado = vwLotRecup.ViewLoteamentoRecuperado()
+viewLoteamentoTipo = vwLotTipo.ViewLoteamentoTipo()
+viewLoteamentoStatusVirtua = vwLotVirtua.ViewLoteamentoStatusVirtua()
+viewStatusVirtuaQuantidade = vwSta.ViewStatusVirtuaQuantidade()
+viewGerarApresentacao = vwGerApre.ViewGerarApresentacao()
+viewConfiguracao = vwConfig.ViewConfiguracao()
+
+ctlParametrizacao = CTLParametrizacao.carregar()
 
 df_contratante = CTLPagamento.consultarContratantesDistintos()
 
-if ctlDadosArquivoExcel.haNovosArquivos():
-    st.warning(f'Pagamento {len(ctlDadosArquivoExcel.lista_pagamento)} Distribuição: {len(ctlDadosArquivoExcel.lista_distribuicao)}')
-    if st.button('Atualizar Arquivos',type='primary'):
-        try:
-            ctlDadosArquivoExcel.processarArquivos()
-            st.success("Arquivos atualizados com sucesso")
-        except Exception as e:
-            mensagem = traceback.format_exc()
-            with st.expander('Falha no processamento do arquivo'):
-                st.markdown(mensagem)
-    
+if ctlParametrizacao.haCarga():
+    vwArqExcel.ViewDadosArquivoExcel().criar()
+
 entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(df_contratante["Contratante"].unique()))
  
 
@@ -72,127 +74,32 @@ if entContratante.nome != 'Selecione...':
             #Loteamento por Caixa            
             viewLoteamentoCaixa.criar(entContratante, r_ap1, altura)
 
-
             #Loteamento por valor recuperado
-            df_loteamento_recuperado = CTLPagamento.consultarLoteamentoValorRecuperado(entContratante)
-            df_loteamento_recuperado["Valor Recuperado"] = df_loteamento_recuperado["Total"].apply(lambda x: ut.formatarMoedaReal(x))            
-            row_df_recuperado ={"Loteamento" :"Total geral", "Valor Recuperado" : ut.formatarMoedaReal(df_loteamento_recuperado["Total"].sum())}            
+            viewLoteamentoRecuperado.criar(entContratante)
             
-            fig_loteamento_recuperado = px.pie(df_loteamento_recuperado, values='Total', names='Loteamento',
-                                          labels={"Total":"Valor Recuperado"},
-                                        title='Loteamento por Valor Recuperado', opacity=0.80)
-            fig_loteamento_recuperado.update_traces(textinfo='percent')
-            
-            df_loteamento_statusvirtua_aux = CTLDistribuicao.consultarLoteamentoValorTotal(entContratante)
-            if df_loteamento_statusvirtua_aux.empty:
-                #df_loteamento_recuperado = df_loteamento_recuperado.drop("Total", axis=1)            
-                #Grafico Loteamento por valor recuperado
-                r_ap2[1].container(height=altura+80).plotly_chart(fig_loteamento_recuperado, use_container_with=True)                
-                #Tabela Loteamento por valor recuperado
-                df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df_recuperado
-                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True, use_container_width=True)
-            
-            #r_ap2[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_recuperado_total)}')
-            
+            viewLoteamentoStatusVirtua.inicializar(entContratante)            
+            if not viewLoteamentoStatusVirtua.haStatus():
+                viewLoteamentoRecuperado.atualizaDados(r_ap2, altura)
+           
             #Loteamento por tipo de negociação
-            df_loteamento_tipo = CTLPagamento.consultarTipoNegociacao(entContratante)
-            df_loteamento_tipo["Valor Recuperado"] = df_loteamento_tipo["Total"].apply(lambda x: ut.formatarMoedaReal(x))
-            #df_loteamento_tipo_total = df_loteamento_tipo["Total"].sum()
-            #df_loteamento_tipo_quantidade_total = df_loteamento_tipo["Qtde"].sum()
-            
-            row_df ={"Tipo" :"Total geral","Qtde" : df_loteamento_tipo["Qtde"].sum(), "Valor Recuperado" : ut.formatarMoedaReal(df_loteamento_tipo["Total"].sum())}            
-            #df_loteamento_tipo = df_loteamento_tipo.drop("Total", axis=1)            
-            #Tabela
-            df_loteamento_tipo.loc[len(df_loteamento_tipo)] = row_df
-            r_ap3[0].container(height=altura+80).dataframe(df_loteamento_tipo[["Tipo","Qtde","Valor Recuperado"]], hide_index=True, use_container_width=True)        
-            #r_ap3[0].info(f'Total geral....: Quantidade: {df_loteamento_tipo_quantidade_total}    Valor: {ut.formatarMoedaReal(df_loteamento_tipo_total)}')
+            viewLoteamentoTipo.criar(entContratante, r_ap3, altura)
             
             
             #Loteamento por status virtua
-            if not df_loteamento_statusvirtua_aux.empty:                        
-                df_loteamento_statusvirtua = pd.merge(df_loteamento_statusvirtua_aux, df_loteamento_recuperado, how="left", on="Loteamento")
-                df_loteamento_statusvirtua["Valor de Inadimplência"] = df_loteamento_statusvirtua["TotalInadimplencia"].apply(lambda x: ut.formatarMoedaReal(x))
-                df_loteamento_statusvirtua["% Recuperada"] = (df_loteamento_statusvirtua["Total"] / df_loteamento_statusvirtua["TotalInadimplencia"]) *100
-                df_loteamento_statusvirtua["% Recuperada"] = df_loteamento_statusvirtua["% Recuperada"].apply(lambda x: ut.formatarPorcentagem(x))
+            if viewLoteamentoStatusVirtua.haStatus():                        
+                #Loteamento por valor recuperado
+                viewLoteamentoRecuperado.atualizaDados(r_ap2, altura)
                 
-                #df_loteamento_statusvirtua_totalQtde = df_loteamento_statusvirtua["Qtde"].sum()
-                #df_loteamento_statusvirtua_totalValor = df_loteamento_statusvirtua["TotalInadimplencia"].sum()
-                total_porcentagem = ut.formatarPorcentagem((df_loteamento_recuperado["Total"].sum() / df_loteamento_statusvirtua["TotalInadimplencia"].sum()) * 100)
-                row_df ={"Loteamento" :"Total geral", "Qtde" : df_loteamento_statusvirtua["Qtde"].sum(),  "Valor de Inadimplência" : ut.formatarMoedaReal(df_loteamento_statusvirtua["TotalInadimplencia"].sum()), "% Recuperada" : total_porcentagem}            
-                
-                #df_loteamento_recuperado = df_loteamento_recuperado.drop("Total", axis=1)
-                df_loteamento_statusvirtua = df_loteamento_statusvirtua.drop("Total", axis=1)
-                df_loteamento_statusvirtua = df_loteamento_statusvirtua.drop("Valor Recuperado", axis=1)
-                #df_loteamento_statusvirtua = df_loteamento_statusvirtua.drop("TotalInadimplencia", axis=1)
-                                
-                #Grafico Loteamento por valor recuperado
-                r_ap2[1].container(height=altura+80).plotly_chart(fig_loteamento_recuperado, use_container_with=True)                
-                #Tabela Loteamento por valor recuperado
-                df_loteamento_recuperado.loc[len(df_loteamento_recuperado)] = row_df_recuperado
-                r_ap2[0].container(height=altura+80).dataframe(df_loteamento_recuperado[["Loteamento","Valor Recuperado"]], hide_index=True, use_container_width=True)
-                
-                #Tabela Loteamento por valor recuperado
-                df_loteamento_statusvirtua.loc[len(df_loteamento_statusvirtua)] = row_df
-                r_ap3[1].container(height=altura+80).dataframe(df_loteamento_statusvirtua[["Loteamento","Qtde","Valor de Inadimplência","% Recuperada"]], hide_index=True, use_container_width=True)
-                #r_ap4[0].info(f'Total Quantidade: {df_loteamento_statusvirtua_totalQtde} Total Valor  {ut.formatarMoedaReal(df_loteamento_statusvirtua_totalValor)}')
+                viewLoteamentoStatusVirtua.criar(r_ap3,altura, viewLoteamentoRecuperado.apresentacaoView.df_tabela)
             else:
                 r_ap3[1].warning(f"Não há configuração dos status virtua definido para Contratante {entContratante} em {entContratante.mes}/{entContratante.ano}")              
            
-            #Status virtua por total
-            df_statusvirtua_quantidade = CTLDistribuicao.consultarStatusVirtuaTotal(entContratante)
-            #df_statusvirtua_total = df_statusvirtua["Quantidade"].sum()
-            row_df ={"Status" :"Total geral", "Quantidade" : df_statusvirtua_quantidade["Quantidade"].sum()}            
-            df_statusvirtua_quantidade.loc[len(df_statusvirtua_quantidade)] = row_df
-            r_ap5[0].container(height=altura+80,).dataframe(df_statusvirtua_quantidade[["Status","Quantidade"]], hide_index=True, use_container_width=True)        
-            #r_ap5[0].info(f'Total geral: {df_statusvirtua_total}')
-            #Grafico
-            fig_statusvirtua = px.bar(df_statusvirtua_quantidade.sort_values("Quantidade", ascending=True),
-                                                x="Quantidade", 
-                                                y="Status", 
-                                                title="Quantidade por Status Virtua", 
-                                                orientation="h",
-                                                text_auto='.2s')
-            fig_statusvirtua.update_traces(textangle=0, textposition="outside")
-        
-            #colours = ['#5463FF', '#FFC300', '#79b159']
-            #fig_forma_convenio_faturamento.update_traces(marker={'colors': colours})        
-            r_ap5[1].container(height=altura+80).plotly_chart(fig_statusvirtua, use_container_with=True)
+            #Status Virtua Quantidade
+            viewStatusVirtuaQuantidade.criar(entContratante, r_ap5, altura)
         
 
         with tab_configuracao:
-            st.write(f"Selecione os Status Virtua para referente ao período {entContratante.mes}/{entContratante.ano}")
-            #df_tipos_statusvirtua = dbDistribuicao.consultarStatusVirtuaDistintos(gContratante)
-            #df_configuracoes = dbConfiguracao.consultar(gContratante, gAno, gMes)
-            #df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == "status"]
-            #cmbSelecionados = st.multiselect('',
-            #    df_tipos_statusvirtua,
-            #    df_configuracao["ConfValor"],
-            #    placeholder='Selecione...')
-            entConfiguracaoResultado = CTLConfiguracaoResultado.obter(entContratante)
-            cmbSelecionados = st.multiselect('',
-                entConfiguracaoResultado.statusVirtua,
-                entConfiguracaoResultado.status,
-                placeholder='Selecione...')
-            chkTodoAno = st.checkbox(f"Configurar para todos os meses de {entContratante.ano}")
-            
-            if st.button("Salvar Configurações", type="secondary"):
-                entConfiguracaoResultado.status = cmbSelecionados
-                if CTLConfiguracaoResultado.salvarStatus(entConfiguracaoResultado, chkTodoAno):
-                    st.success("Configurações salvas com sucesso")
-                else:
-                    st.error("Falha ao Salvar as Configurações")
-
-
-            sms = st.number_input("Quantidade de SMS", value=entConfiguracaoResultado.sms, placeholder="Informe a quantidade...")                    
-            ligacao = st.number_input("Quantidade de Ligações", value=entConfiguracaoResultado.ligacao, placeholder="Informe a quantidade...")        
-            
-            if st.button("Salvar Quantidade", type="secondary"):
-                entConfiguracaoResultado.sms = sms
-                entConfiguracaoResultado.ligacao = ligacao
-                if CTLConfiguracaoResultado.salvarQuantidade(entConfiguracaoResultado):
-                    st.success("Quantidades salvas com sucesso")
-                else:
-                    st.error("Falha ao Salvar os dados de quantidade")
+           viewConfiguracao.criar(entContratante)
                                     
      
 
@@ -205,32 +112,16 @@ if entContratante.nome != 'Selecione...':
             r_da2[0].write("Dados de Distribuição")
             r_da2[0].dataframe(CTLDistribuicao.apresentarDFOriginal(entApresentacaoResultado.df_distribuicao))
             
-    if st.sidebar.button("Gerar Apresentação", disabled=df_loteamento_statusvirtua_aux.empty):
-        try:
-            apresentacaoExcel = entAp.ApresentacaoExcel(entConfiguracaoResultado,
-                                                            viewLoteamentoCaixa, 
-                                                            df_loteamento_recuperado,
-                                                            df_loteamento_tipo,
-                                                            df_loteamento_statusvirtua,
-                                                            df_statusvirtua_quantidade
-                                                            )
-            excel = ctlAp.CTLApresentacaoExcel(apresentacaoExcel).gerarPeloTemplate() 
-            if excel :    
-                st.sidebar.success("Arquivo gerado com sucesso")      
-        
-                if apresentacaoExcel.CaminhoArquivo:
-                    with open(apresentacaoExcel.CaminhoArquivo, "rb") as template_file:
-                        template_byte = template_file.read()
-
-                        st.sidebar.download_button(label="Download",
-                                            data=template_byte,
-                                            file_name= apresentacaoExcel.NomeArquivo ,
-                                            mime='application/octet-stream')
-            else:
-                st.sidebar.warning("Não foi possível gerar a apresentação devido a falta do template")      
-        except Exception as e:
-             st.sidebar.error(f"Falha no geração do arquivo de Apresentação: {e}")
-
+   
+   
+    apresentacaoExcel = entAp.ApresentacaoExcel(viewConfiguracao.configuracaoResultado,
+                                                viewLoteamentoCaixa, 
+                                                viewLoteamentoRecuperado,
+                                                viewLoteamentoTipo,
+                                                viewLoteamentoStatusVirtua,
+                                                viewStatusVirtuaQuantidade
+                                                )
+    viewGerarApresentacao.criar(apresentacaoExcel, not viewLoteamentoStatusVirtua.haStatus())
     
         
 

@@ -13,7 +13,7 @@ class ViewLoteamentoCaixa(vw.ViewBase):
         
         df_loteamento_caixa = CTLPagamento.consultarLoteamentoValorPago(contratante)
         df_loteamento_caixa["Valor em Caixa"] = df_loteamento_caixa["Total"].apply(lambda x: ut.formatarMoedaReal(x))            
-        row_df ={"Loteamento" :"Total geral", "Valor em Caixa" : ut.formatarMoedaReal(df_loteamento_caixa["Total"].sum())}                
+        self.df_resumo ={"Loteamento" :"Total geral", "Valor em Caixa" : ut.formatarMoedaReal(df_loteamento_caixa["Total"].sum())}                
                     
         fig_loteamento_caixa = px.pie(df_loteamento_caixa, values='Total', names='Loteamento',
                                         labels={"Total":"Valor em Caixa"},
@@ -25,10 +25,12 @@ class ViewLoteamentoCaixa(vw.ViewBase):
         secao[1].container(height=altura+80).plotly_chart(fig_loteamento_caixa, use_container_with=True)
         
         #Tabela
-        df_loteamento_caixa.loc[len(df_loteamento_caixa)] = row_df
+        df_loteamento_caixa.loc[len(df_loteamento_caixa)] = self.df_resumo
         secao[0].container(height=altura+80).dataframe(df_loteamento_caixa[["Loteamento","Valor em Caixa"]], hide_index=True, use_container_width=True )            
-        #r_ap1[0].info(f'Total geral: {ut.formatarMoedaReal(df_loteamento_caixa_total)}')
+       
         self.criarView(df_loteamento_caixa, fig_loteamento_caixa)
+    
+        
         
 
         

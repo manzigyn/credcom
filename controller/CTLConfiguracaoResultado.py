@@ -49,7 +49,7 @@ def replicar(contratante: entCon.Contratante):
     return df_saida
 
 def salvarStatus(configuracao: entConfig.ConfiguracaoResultado, todoAno=False) -> bool:
-    df_configuracao = criarDFStatus(configuracao.contratante, configuracao.status, todoAno)
+    df_configuracao = criarDFStatus(configuracao, todoAno)
     return dbConf.DBConfiguracaoResultado().salvar(df_configuracao)
 
 def salvarQuantidade(configuracao: entConfig.ConfiguracaoResultado) -> bool:

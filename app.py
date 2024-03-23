@@ -5,7 +5,8 @@ import streamlit as st
 show_pages(
     [
         Page("paginas/resultado.py", "Resultados", ":chart_with_upwards_trend:"),
-        Page("paginas/configuracao.py","Configuração",":clipboard:")
+        Page("paginas/parametrizacao.py","Parametrização",":clipboard:"),
+        Page("paginas/apresentacao.py","Apresentações",":bar_chart:")
     ]
 )
 
