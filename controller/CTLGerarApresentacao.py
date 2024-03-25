@@ -82,7 +82,7 @@ class CTLApresentacaoExcel:
             self.write_df_excel(self.apresentacaoExcel.df_statusvirtua_quantidade, worksheet, row,2)
             #row += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
             #https://docs.xlwings.org/en/stable/matplotlib.html
-            worksheet.pictures.add(self.apresentacaoExcel.gr_loteamento_caixa, name='Loteamento Caixa', update=True)
+            #worksheet.pictures.add(self.apresentacaoExcel.gr_loteamento_caixa, name='Loteamento Caixa', update=True)
             
             workbook.save(arquivo_destino)
             self.apresentacaoExcel.caminhoArquivo = arquivo_destino
