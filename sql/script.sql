@@ -153,7 +153,7 @@ CREATE TABLE TbLogGeracao (
 	GerAno int not null,
 	GerMes int not null,
 	GerOperador VARCHAR(100) not null,
-	GerData VARCHAR(8) not null,
+	GerData VARCHAR(10) not null,
 	GerHorario VARCHAR(8) not null,
 	GerArquivo VARCHAR(100) not null,
 	GerCaminho VARCHAR(200) not null

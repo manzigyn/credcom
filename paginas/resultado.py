@@ -48,7 +48,7 @@ df_contratante = CTLPagamento.consultarContratantesDistintos()
 if ctlParametrizacao.haCarga():
     vwArqExcel.ViewDadosArquivoExcel().criar()
 
-entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(df_contratante["Contratante"].unique()))
+entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(CTLPagamento.obterListaContratante(df_contratante)))
  
 
 label = f'Apresentação de Resultados - {entContratante.nome}'

@@ -68,8 +68,8 @@ def obter(contratante: entCon.Contratante) -> entConfig.ConfiguracaoResultado:
     configuracaoResultado.status = df_configuracao["ConfValor"]
     
     df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == enConfig.EnumConfiguracaoResultado.SMS]
-    configuracaoResultado.sms = int(df_configuracao["ConfValor"].unique())
+    configuracaoResultado.sms = int(df_configuracao["ConfValor"].unique()) if not df_configuracao["ConfValor"].isna else 0
     
     df_configuracao = df_configuracoes[df_configuracoes["ConfChave"] == enConfig.EnumConfiguracaoResultado.LIGACAO]
-    configuracaoResultado.ligacao = int(df_configuracao["ConfValor"].unique())
+    configuracaoResultado.ligacao = int(df_configuracao["ConfValor"].unique()) if not df_configuracao["ConfValor"].isna else 0
     return configuracaoResultado

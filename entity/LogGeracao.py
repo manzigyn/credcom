@@ -7,7 +7,7 @@ from entity import Contratante as entCont
 class LogGeracao():
     contratante: entCont.Contratante = field(default_factory=entCont.Contratante)
     operador = 1
-    data: str = datetime.today().strftime('%d/%m/%y')
+    data: str = datetime.today().strftime('%d/%m/%Y')
     horario: str = datetime.today().strftime('%H:%M:%S')
     arquivo: str = ''
     caminho: str = ''

@@ -101,6 +101,9 @@ def consultarContratantesDistintos() -> pd.DataFrame:
 def consultarContratante(nome: str) -> pd.DataFrame:
     return dbPgto.DBPagamento().consultarContratante(nome)
     
+def obterListaContratante(df: pd.DataFrame) -> list:
+    return df["Contratante"].unique()
+
 def obterListaAno(df: pd.DataFrame) -> list:
     return df["PagAno"].unique()
     
