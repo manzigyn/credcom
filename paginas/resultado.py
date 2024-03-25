@@ -15,7 +15,7 @@ from view import ViewLoteamentoStatusVirtua as vwLotVirtua
 from view import ViewStatusVirtuaQuantidade as vwSta
 from view import ViewImportarArquivoExcel as vwArqExcel
 from view import ViewGerarApresentacao as vwGerApre
-from view import ViewParametrizacao as vwConfig
+from view import ViewConfiguracaoResultado as vwConfig
 from utils import utilidades as ut
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
@@ -39,7 +39,7 @@ viewLoteamentoTipo = vwLotTipo.ViewLoteamentoTipo()
 viewLoteamentoStatusVirtua = vwLotVirtua.ViewLoteamentoStatusVirtua()
 viewStatusVirtuaQuantidade = vwSta.ViewStatusVirtuaQuantidade()
 viewGerarApresentacao = vwGerApre.ViewGerarApresentacao()
-viewConfiguracao = vwConfig.ViewParametrizacao()
+viewConfiguracao = vwConfig.ViewConfiguracaoResultado()
 
 ctlParametrizacao = CTLParametrizacao.carregar()
 

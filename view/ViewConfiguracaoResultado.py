@@ -6,7 +6,7 @@ from entity import Contratante as entCont
 from entity import ConfiguracaoResultado as entConfig
 
 @dataclass
-class ViewParametrizacao():
+class ViewConfiguracaoResultado():
     
     configuracaoResultado : entConfig.ConfiguracaoResultado = field(default_factory=entConfig.ConfiguracaoResultado)
     
