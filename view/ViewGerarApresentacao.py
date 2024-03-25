@@ -6,14 +6,12 @@ from entity import ApresentacaoExcel as entAp
 @dataclass
 class ViewGerarApresentacao():
     
-    def criar(self, apresentacaoExcel: entAp.ApresentacaoExcel, habilitaBotao: bool):
+    def criar(self, apresentacaoExcel: entAp.ApresentacaoExcel, desabilitaBotao: bool):
 
         ctlApresentacaoExcel = ctlAp.CTLApresentacaoExcel(apresentacaoExcel)
-        habilitaBotao = habilitaBotao or ctlApresentacaoExcel.parametrizacao.haGeracao()
-        
-        msgHelp = "Configuração corrente e parametrização devem ser informadas para a geração da apresentação" if not habilitaBotao else ""
-        
-        if st.sidebar.button("Gerar Apresentação", disabled= not habilitaBotao, help=msgHelp):
+        desabilitaBotao = desabilitaBotao or not ctlApresentacaoExcel.parametrizacao.haGeracao()
+       
+        if st.sidebar.button("Gerar Apresentação", disabled= desabilitaBotao):
             try:
                 excel = ctlApresentacaoExcel.gerarPeloTemplate() 
                 if excel :    
@@ -31,3 +29,6 @@ class ViewGerarApresentacao():
                     st.sidebar.warning("Não foi possível gerar a apresentação devido a falta do template")      
             except Exception as e:
                 st.sidebar.error(f"Falha no geração do arquivo de Apresentação: {e}")
+                
+        if desabilitaBotao:
+            st.sidebar.warning("Falta definir a parametrização para os dados selecionados")

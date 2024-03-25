@@ -11,7 +11,7 @@ class ViewLoteamentoStatusVirtua(vw.ViewBase):
     def inicializar(self, contratante: entCon.Contratante):
         self.apresentacaoView.df_tabela_aux = CTLDistribuicao.consultarLoteamentoValorTotal(contratante)
         
-    def haStatus(self):
+    def haStatus(self) -> bool:
         return not self.apresentacaoView.df_tabela_aux.empty
     
     def criar(self, secao, altura: int,  df_loteamento_recuperado: pd.DataFrame):

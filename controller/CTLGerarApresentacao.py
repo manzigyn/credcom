@@ -9,6 +9,9 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Fo
 import openpyxl
 import os
 from datetime import datetime
+#import xlwings as xw
+#from pyxll import xl_func, plot
+#import plotly.express as px
 
 class CTLApresentacaoExcel:
     
@@ -46,15 +49,18 @@ class CTLApresentacaoExcel:
             row =11
             linha_formula = row+len(self.apresentacaoExcel.df_loteamento_caixa.index)
             formula=f'SOMA(C{row+1}:C{linha_formula-1})'            
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_caixa[["Loteamento","Total"]].rename(columns={"Total":"Valor em Caixa"}), worksheet, row,2, formula, linha_formula,3)
+            soma = self.apresentacaoExcel.df_loteamento_caixa["Total"].sum()
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_caixa[["Loteamento","Total"]].rename(columns={"Total":"Valor em Caixa"}), worksheet, row,2, soma, linha_formula,3)
             
             linha_formula = row+len(self.apresentacaoExcel.df_loteamento_recuperado.index)
             formula=f'SOMA(F{row+1}:F{linha_formula-1})'            
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_recuperado[["Loteamento","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,5,formula, linha_formula,6)
+            soma = self.apresentacaoExcel.df_loteamento_recuperado["Total"].sum()
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_recuperado[["Loteamento","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,5, soma, linha_formula,6)
             
             linha_formula = row+len(self.apresentacaoExcel.df_loteamento_tipo.index)
             formula=f'SOMA(J{row+1}:J{linha_formula-1})'            
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_tipo[["Tipo","Qtde","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,8,formula, linha_formula,10)
+            soma = self.apresentacaoExcel.df_loteamento_tipo["Total"].sum()
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_tipo[["Tipo","Qtde","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,8, soma, linha_formula,10)
 
             row += len(self.apresentacaoExcel.df_loteamento_caixa.index)
             if row < len(self.apresentacaoExcel.df_loteamento_recuperado.index):
@@ -63,8 +69,9 @@ class CTLApresentacaoExcel:
             row += 4    
             linha_formula = row+len(self.apresentacaoExcel.df_loteamento_statusvirtua.index)
             formula=f'SOMA(D{row+1}:D{linha_formula-1})'            
+            soma = self.apresentacaoExcel.df_loteamento_statusvirtua["TotalInadimplencia"].sum()
 
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_statusvirtua[["Loteamento","Qtde","TotalInadimplencia","% Recuperada"]].rename(columns={"TotalInadimplencia":"Valor de Inadimplência"}), worksheet, row,2, formula, linha_formula,4)
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_statusvirtua[["Loteamento","Qtde","TotalInadimplencia","% Recuperada"]].rename(columns={"TotalInadimplencia":"Valor de Inadimplência"}), worksheet, row,2, soma, linha_formula,4)
             row += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
             
             
@@ -73,6 +80,9 @@ class CTLApresentacaoExcel:
             #worksheet.add_image(img,f'B{row}')
             
             self.write_df_excel(self.apresentacaoExcel.df_statusvirtua_quantidade, worksheet, row,2)
+            #row += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
+            #https://docs.xlwings.org/en/stable/matplotlib.html
+            worksheet.pictures.add(self.apresentacaoExcel.gr_loteamento_caixa, name='Loteamento Caixa', update=True)
             
             workbook.save(arquivo_destino)
             self.apresentacaoExcel.caminhoArquivo = arquivo_destino
@@ -85,7 +95,7 @@ class CTLApresentacaoExcel:
             e.add_note(f'Não foi possível gerar o arquivo {arquivo_destino}, devido ao erro {e}')
             raise
     
-    def write_df_excel(self, df, ws, startrow=0, startcol=0, formula='', linha_formula=-1, coluna_formula=-1, Header=True, Index=False):
+    def write_df_excel(self, df, ws, startrow=0, startcol=0, formula=0, linha_formula=-1, coluna_formula=-1, Header=True, Index=False):
         """Write DataFrame df to openpyxl worksheet ws"""
         startrow-=1
         startcol-=1
@@ -97,15 +107,15 @@ class CTLApresentacaoExcel:
                 ws.cell(row=r_idx, column=c_idx).value = value
                 if isinstance(value, float):
                     ws.cell(row=r_idx, column=c_idx).number_format ='R$ #,##0.00'
-                if r_idx == startrow + 1:
+                if r_idx == startrow + 1: #Cabeçalho
                     ws.cell(row=r_idx, column=c_idx).font = self.fonteCabecalhoDF()
                     ws.cell(row=r_idx, column=c_idx).fill = self.fundoCabecalhoDF()
                 else:
                     if c_idx > startcol + 1:
                         ws.cell(row=r_idx, column=c_idx).alignment = Alignment(horizontal="right")
         if linha_formula > 0 and coluna_formula > 0:
-            ws.cell(row=linha_formula, column=coluna_formula).value = f'={formula}'
-            ws.cell(row=linha_formula, column=coluna_formula).value = ws.cell(row=linha_formula, column=coluna_formula).value.replace("==","=")
+            ws.cell(row=linha_formula, column=coluna_formula).value = formula #f'={formula}'
+            #ws.cell(row=linha_formula, column=coluna_formula).value = ws.cell(row=linha_formula, column=coluna_formula).value.replace("==","=")
 
                 
     def fonteCabecalhoDF(self):
@@ -122,3 +132,8 @@ class CTLApresentacaoExcel:
         return PatternFill(fill_type="solid",
                  start_color='00003366',
                  end_color='00003366')
+        
+    #https://stackoverflow.com/questions/65272408/plotly-how-to-embed-a-fully-interactive-plotly-figure-in-excel
+    #@xl_func
+    #def plotly_plot(fig):
+    #    plot(fig)

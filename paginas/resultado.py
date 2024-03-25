@@ -15,7 +15,7 @@ from view import ViewLoteamentoStatusVirtua as vwLotVirtua
 from view import ViewStatusVirtuaQuantidade as vwSta
 from view import ViewImportarArquivoExcel as vwArqExcel
 from view import ViewGerarApresentacao as vwGerApre
-from view import ViewConfiguracao as vwConfig
+from view import ViewParametrizacao as vwConfig
 from utils import utilidades as ut
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
@@ -39,14 +39,14 @@ viewLoteamentoTipo = vwLotTipo.ViewLoteamentoTipo()
 viewLoteamentoStatusVirtua = vwLotVirtua.ViewLoteamentoStatusVirtua()
 viewStatusVirtuaQuantidade = vwSta.ViewStatusVirtuaQuantidade()
 viewGerarApresentacao = vwGerApre.ViewGerarApresentacao()
-viewConfiguracao = vwConfig.ViewConfiguracao()
+viewConfiguracao = vwConfig.ViewParametrizacao()
 
 ctlParametrizacao = CTLParametrizacao.carregar()
 
 df_contratante = CTLPagamento.consultarContratantesDistintos()
 
 if ctlParametrizacao.haCarga():
-    vwArqExcel.ViewDadosArquivoExcel().criar()
+    vwArqExcel.ViewImportarArquivoExcel().criar()
 
 entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(CTLPagamento.obterListaContratante(df_contratante)))
  
@@ -92,7 +92,7 @@ if entContratante.nome != 'Selecione...':
                 
                 viewLoteamentoStatusVirtua.criar(r_ap3,altura, viewLoteamentoRecuperado.apresentacaoView.df_tabela)
             else:
-                r_ap3[1].warning(f"Não há configuração dos status virtua definido para Contratante {entContratante} em {entContratante.mes}/{entContratante.ano}")              
+                r_ap3[1].warning(f"Não há configuração dos status virtua definido para Contratante {entContratante.nome} em {entContratante.mes}/{entContratante.ano}")              
            
             #Status Virtua Quantidade
             viewStatusVirtuaQuantidade.criar(entContratante, r_ap5, altura)

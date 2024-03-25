@@ -31,7 +31,7 @@ class Parametrizacao():
                 self.dir_apresentacao = obj.ParValor
     
     def haCarga(self) -> bool:
-        return self.dir_dados and self.dir_processados
+        return not (ut.estarVazia(self.dir_dados) or ut.estarVazia(self.dir_processados) )
     
     def haGeracao(self) -> bool:
-        return self.dir_template and self.dir_apresentacao
+        return not (ut.estarVazia(self.dir_template) or ut.estarVazia(self.dir_apresentacao) )

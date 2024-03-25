@@ -30,6 +30,9 @@ def importaDF(df, arquivo) -> pd.DataFrame:
         df["DisVenda"] = pd.NA            
     if "DisStatus2" not in df:
         df["DisStatus2"] = pd.NA            
+    if "DisAtrasoReal" not in df:
+        df["DisAtrasoReal"] = pd.NA            
+        
     df = df[["DisCarteira",
                 "DisOperador",
                 "DisNumeroParcelas",

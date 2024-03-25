@@ -10,6 +10,8 @@ show_pages(
     ]
 )
 
+#login https://github.com/mkhorasani/Streamlit-Authenticator
+#https://www.youtube.com/watch?v=dlAjSvrjHeU
 
 #ul.set_png_as_page_bg('img/background.jpeg')  
 

@@ -6,7 +6,7 @@ from entity import Contratante as entCont
 from entity import ConfiguracaoResultado as entConfig
 
 @dataclass
-class ViewConfiguracao():
+class ViewParametrizacao():
     
     configuracaoResultado : entConfig.ConfiguracaoResultado = field(default_factory=entConfig.ConfiguracaoResultado)
     
@@ -16,10 +16,11 @@ class ViewConfiguracao():
         cmbSelecionados = st.multiselect('',
             entConfiguracaoResultado.statusVirtua,
             entConfiguracaoResultado.status,
-            placeholder='Selecione...')
-        chkTodoAno = st.checkbox(f"Configurar para todos os meses de {contratante.ano}")
+            placeholder='Selecione...',
+            label_visibility='collapsed')
+        chkTodoAno = st.checkbox(f"Aplicar para todos os meses de {contratante.ano}")
         
-        if st.button("Salvar Configurações", type="secondary"):
+        if st.button("Salvar Status", type="secondary"):
             entConfiguracaoResultado.status = cmbSelecionados
             if CTLConfiguracaoResultado.salvarStatus(entConfiguracaoResultado, chkTodoAno):
                 st.success("Configurações salvas com sucesso")

@@ -13,11 +13,17 @@ def importarDF(df, arquivo) -> pd.DataFrame:
     df["PagAno"] = df["PagDataPagamentoParcela"].apply((lambda x: str(x.year)))
     df["PagMes"] = df["PagDataPagamentoParcela"].apply((lambda x: int(x.month)))
     #Conversão de valores monetários
-    df['PagValorHonorarioAcordo'] = df['Vlr. Honorário Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
-    df['PagValorHonorarioAcordo'] = df['PagValorHonorarioAcordo'].astype(float)
-    
-    df['PagValorTotalAcordo'] = df['Vlr. Total Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
-    df['PagValorTotalAcordo'] = df['PagValorTotalAcordo'].astype(float)
+    if "Vlr. Honorário Acordo" not in df:
+        df["PagValorHonorarioAcordo"] = pd.NA
+    else:        
+        df['PagValorHonorarioAcordo'] = df['Vlr. Honorário Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorHonorarioAcordo'] = df['PagValorHonorarioAcordo'].astype(float)
+        
+    if 'Vlr. Total Acordo' not in df:
+        df["PagValorTotalAcordo"] = pd.NA
+    else:
+        df['PagValorTotalAcordo'] = df['Vlr. Total Acordo'].apply((lambda x: ut.tratarMoedaReal(x)))
+        df['PagValorTotalAcordo'] = df['PagValorTotalAcordo'].astype(float)
     
     df['PagValorParcela'] = df['Valor parcela'].apply((lambda x: ut.tratarMoedaReal(x)))
     df['PagValorParcela'] = df['PagValorParcela'].astype(float)
@@ -26,6 +32,12 @@ def importarDF(df, arquivo) -> pd.DataFrame:
     df['PagValorRecuperado'] = df['PagValorRecuperado'].astype(float)
     
     df["PagArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo)
+    
+    if 'Nr. Acordo' not in df:
+        df["PagNumeroAcordo"] = pd.NA
+        
+    if 'Bol. Nosso Número' not in df:
+        df["PagNossoNumero"] = pd.NA        
     
     df = df.rename(columns={ "Contratante": "PagContratante",
                             "CPF  CNPJ"    : "PagCpfCnpj",

@@ -4,7 +4,7 @@ from controller import CTLDadosArquivoExcel as ctlArqExc
 import traceback
 
 @dataclass
-class ViewDadosArquivoExcel():
+class ViewImportarArquivoExcel():
     
     def criar(self):
         ctlDadosArquivoExcel = ctlArqExc.DadosArquivoExcel()

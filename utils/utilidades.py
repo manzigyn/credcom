@@ -97,7 +97,13 @@ def formatarArquivoDataModificacao(arquivo) -> string:
     return f'{obterNomeArquivo(arquivo)} {obterDataHoraModificacao(arquivo)}'
 
 def tratarMoedaReal(valor: str)-> string:
-    return valor.replace("R$","").replace(",",".").replace(" ","")
+    try:
+        if valor:
+            return valor.replace("R$","").replace(",",".").replace(" ","")
+        else:
+            return "0.00"
+    except AttributeError:
+        return "0.00"
 
 @st.cache_data
 def get_base64_of_bin_file(png_file):
@@ -165,3 +171,5 @@ def add_logo2(imagem):
 def inserirCaracterFinal(valor: str, caracter: str) -> str:
     return f'{valor}{caracter}' if valor and valor[-1] != caracter else valor
 
+def estarVazia(valor: str) -> bool:
+    return len(valor.strip()) == 0

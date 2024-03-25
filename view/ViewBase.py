@@ -16,3 +16,6 @@ class ViewBase():
     
     def inserirResumo(self):
         self.apresentacaoView.df_tabela.loc[len(self.apresentacaoView.df_tabela)] = self.df_resumo
+        
+    def df_style(self):
+        return "font-weight: bold"

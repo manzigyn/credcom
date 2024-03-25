@@ -27,3 +27,4 @@ class ApresentacaoExcel:
         self.fig_loteamento_caixa = viewLoteamentoCaixa.apresentacaoView.grafico
         self.nomeArquivo = NomeArquivo
         self.caminhoArquivo = CaminhoArquivo
+        self.gr_loteamento_caixa = viewLoteamentoCaixa.apresentacaoView.grafico
