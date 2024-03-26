@@ -11,7 +11,7 @@ class ViewImportarArquivoExcel():
 
         if ctlDadosArquivoExcel.haNovosArquivos():
             st.warning(f'Pagamento {len(ctlDadosArquivoExcel.lista_pagamento)} Distribuição: {len(ctlDadosArquivoExcel.lista_distribuicao)}')
-            if st.button('Atualizar Arquivos',type='primary'):
+            if st.button('Importar Arquivos',type='primary'):
                 try:
                     ctlDadosArquivoExcel.processarArquivos()
                     st.success("Arquivos atualizados com sucesso")
