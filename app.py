@@ -6,7 +6,8 @@ show_pages(
     [
         Page("paginas/resultado.py", "Resultados", ":chart_with_upwards_trend:"),
         Page("paginas/parametrizacao.py","Parametrização",":clipboard:"),
-        Page("paginas/apresentacao.py","Apresentações",":bar_chart:")
+        Page("paginas/apresentacao.py","Apresentações",":bar_chart:"),
+        Page("paginas/upload.py","Arquivos",":open_file_folder:")
     ]
 )
 
