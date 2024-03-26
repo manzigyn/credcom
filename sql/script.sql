@@ -158,8 +158,21 @@ CREATE TABLE TbLogGeracao (
 	GerArquivo VARCHAR(100) not null,
 	GerCaminho VARCHAR(200) not null
 );
-create index idx_geranoBkp on TbLogGeracao (GerAno);
+create index idx_gerano on TbLogGeracao (GerAno);
 
-create index idx_germesBkp on TbLogGeracao (GerMes);
+create index idx_germes on TbLogGeracao (GerMes);
 
-create index idx_gercontranteBkp on TbLogGeracao (GerContratante);
+create index idx_gercontrante on TbLogGeracao (GerContratante);
+
+drop table if exists TbLogUpload;
+
+CREATE TABLE TbLogUpload (
+	UplNome VARCHAR(100) not null,	
+	UplTipo VARCHAR(30) not null,
+	UplOperador VARCHAR(100) null,
+	UplResultado VARCHAR(500) not null,
+	UplProcessamento VARCHAR(20) not null
+);
+create index idx_uplnome on TbLogUpload (UplNome);
+
+create index idx_upltipo on TbLogUpload (UplTipo);
