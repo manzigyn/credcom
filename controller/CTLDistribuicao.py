@@ -5,7 +5,7 @@ from model import DBDistribuicao as dbDis
 from entity import Contratante as entCont
 
 def importaDF(df, arquivo) -> pd.DataFrame:
-    df["DisArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo)
+    df["DisArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo) if isinstance(arquivo, str) else arquivo.name
     #Conversão de valores monetários
     df['DisValorTotal'] = df['Valor total'].replace("R$","").replace(".","").replace(",",".").replace(" ","").astype(float)
     df = df.rename(columns={    "Carteira": "DisCarteira",
@@ -31,7 +31,7 @@ def importaDF(df, arquivo) -> pd.DataFrame:
     if "DisStatus2" not in df:
         df["DisStatus2"] = pd.NA            
     if "DisAtrasoReal" not in df:
-        df["DisAtrasoReal"] = pd.NA            
+        df["DisAtrasoReal"] = pd.NA   
         
     df = df[["DisCarteira",
                 "DisOperador",

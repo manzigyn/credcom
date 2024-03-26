@@ -31,7 +31,7 @@ def importarDF(df, arquivo) -> pd.DataFrame:
     df['PagValorRecuperado'] = df['Recuperado'].apply((lambda x: ut.tratarMoedaReal(x)))
     df['PagValorRecuperado'] = df['PagValorRecuperado'].astype(float)
     
-    df["PagArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo)
+    df["PagArquivoProcessado"] = ut.formatarArquivoDataModificacao(arquivo) if isinstance(arquivo, str) else arquivo.name
     
     if 'Nr. Acordo' not in df:
         df["PagNumeroAcordo"] = pd.NA

@@ -46,7 +46,7 @@ ctlParametrizacao = CTLParametrizacao.carregar()
 df_contratante = CTLPagamento.consultarContratantesDistintos()
 
 if ctlParametrizacao.haCarga():
-    vwArqExcel.ViewImportarArquivoExcel().criar()
+    vwArqExcel.ViewImportarArquivoExcel().criar(None)
 
 entContratante.nome = st.sidebar.selectbox("Contratante", options=['Selecione...']+list(CTLPagamento.obterListaContratante(df_contratante)))
  
