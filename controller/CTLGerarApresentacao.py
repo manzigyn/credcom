@@ -9,6 +9,13 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Fo
 import openpyxl
 import os
 from datetime import datetime
+from openpyxl.chart import (
+    PieChart,
+    ProjectedPieChart,
+    Reference
+)
+from openpyxl.chart.series import DataPoint
+from openpyxl.chart.label import DataLabelList
 #import xlwings as xw
 #from pyxll import xl_func, plot
 #import plotly.express as px
@@ -46,40 +53,62 @@ class CTLApresentacaoExcel:
             worksheet['C7'] = self.apresentacaoExcel.sms
             worksheet['C8'] = self.apresentacaoExcel.ligacao
             
-            row =11
-            linha_formula = row+len(self.apresentacaoExcel.df_loteamento_caixa.index)
-            formula=f'SOMA(C{row+1}:C{linha_formula-1})'            
+            linha =11
+            
+            #loteamento valor caixa
+            linha_formula = linha+len(self.apresentacaoExcel.df_loteamento_caixa.index)
+            formula=f'SOMA(C{linha+1}:C{linha_formula-1})'            
             soma = self.apresentacaoExcel.df_loteamento_caixa["Total"].sum()
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_caixa[["Loteamento","Total"]].rename(columns={"Total":"Valor em Caixa"}), worksheet, row,2, soma, linha_formula,3)
-            
-            linha_formula = row+len(self.apresentacaoExcel.df_loteamento_recuperado.index)
-            formula=f'SOMA(F{row+1}:F{linha_formula-1})'            
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_caixa[["Loteamento","Total"]].rename(columns={"Total":"Valor em Caixa"}), worksheet, linha,2, soma, linha_formula,3)
+            linha_lot_val1 = linha
+                        
+            #loteamento valor recuperado
+            linha_formula = linha+len(self.apresentacaoExcel.df_loteamento_recuperado.index)            
+            formula=f'SOMA(F{linha+1}:F{linha_formula-1})'            
             soma = self.apresentacaoExcel.df_loteamento_recuperado["Total"].sum()
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_recuperado[["Loteamento","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,5, soma, linha_formula,6)
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_recuperado[["Loteamento","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, linha,5, soma, linha_formula,6)
             
-            linha_formula = row+len(self.apresentacaoExcel.df_loteamento_tipo.index)
-            formula=f'SOMA(J{row+1}:J{linha_formula-1})'            
+            #loteamento tipo
+            linha_formula = linha+len(self.apresentacaoExcel.df_loteamento_tipo.index)
+            formula=f'SOMA(J{linha+1}:J{linha_formula-1})'            
             soma = self.apresentacaoExcel.df_loteamento_tipo["Total"].sum()
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_tipo[["Tipo","Qtde","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, row,8, soma, linha_formula,10)
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_tipo[["Tipo","Qtde","Total"]].rename(columns={"Total":"Valor Recuperado"}), worksheet, linha,8, soma, linha_formula,10)
 
-            row += len(self.apresentacaoExcel.df_loteamento_caixa.index)
-            if row < len(self.apresentacaoExcel.df_loteamento_recuperado.index):
-                row = len(self.apresentacaoExcel.df_loteamento_recuperado.index)
+            linha += len(self.apresentacaoExcel.df_loteamento_caixa.index)
+            if linha < len(self.apresentacaoExcel.df_loteamento_recuperado.index):
+                linha = len(self.apresentacaoExcel.df_loteamento_recuperado.index)
             
-            row += 4    
-            linha_formula = row+len(self.apresentacaoExcel.df_loteamento_statusvirtua.index)
-            formula=f'SOMA(D{row+1}:D{linha_formula-1})'            
+            
+            linha += 4    
+            
+            #loteamento status virtua
+            linha_formula = linha+len(self.apresentacaoExcel.df_loteamento_statusvirtua.index)
+            formula=f'SOMA(D{linha+1}:D{linha_formula-1})'            
             soma = self.apresentacaoExcel.df_loteamento_statusvirtua["TotalInadimplencia"].sum()
-
-            self.write_df_excel(self.apresentacaoExcel.df_loteamento_statusvirtua[["Loteamento","Qtde","TotalInadimplencia","% Recuperada"]].rename(columns={"TotalInadimplencia":"Valor de Inadimplência"}), worksheet, row,2, soma, linha_formula,4)
-            row += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
+            self.write_df_excel(self.apresentacaoExcel.df_loteamento_statusvirtua[["Loteamento","Qtde","TotalInadimplencia","% Recuperada"]].rename(columns={"TotalInadimplencia":"Valor de Inadimplência"}), worksheet, linha,2, soma, linha_formula,4)
+            linha += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
             
+            pie = PieChart()
+            labels = Reference(worksheet, min_col=2, min_row=linha_lot_val1, max_row=len(self.apresentacaoExcel.df_loteamento_caixa.index))
+            data = Reference(worksheet, min_col=3, min_row=linha_lot_val1, max_row=len(self.apresentacaoExcel.df_loteamento_caixa.index))
+            pie.add_data(data, titles_from_data=True)
+            pie.set_categories(labels)
+            pie.title = "Loteamento por Valor em Caixa"
+            pie.dataLabels = DataLabelList()
+            pie.dataLabels.showPercent = True
+
+            # Cut the first slice out of the pie
+            slice = DataPoint(idx=0, explosion=20)
+            pie.series[0].data_points = [slice]
+
+            worksheet.add_chart(pie, f"D{linha}")
             
             #img_bytes  = self.fig_loteamento_caixa.to_image(format="png")
             #img = openpyxl.drawing.image.Image(img_bytes)
             #worksheet.add_image(img,f'B{row}')
             
-            self.write_df_excel(self.apresentacaoExcel.df_statusvirtua_quantidade, worksheet, row,2)
+            #status virtua quantidade
+            self.write_df_excel(self.apresentacaoExcel.df_statusvirtua_quantidade, worksheet, linha,2)
             #row += len(self.apresentacaoExcel.df_loteamento_statusvirtua.index) + 4
             #https://docs.xlwings.org/en/stable/matplotlib.html
             #worksheet.pictures.add(self.apresentacaoExcel.gr_loteamento_caixa, name='Loteamento Caixa', update=True)

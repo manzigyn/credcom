@@ -19,3 +19,4 @@ class ViewBase():
         
     def df_style(self):
         return "font-weight: bold"
+    
