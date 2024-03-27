@@ -61,7 +61,7 @@ class ViewUpload():
                 #st.write("Planilha:", arquivo.name)
                 #st.write(bytes_data)
                 
-            ctlDadosArquivoExcel = vwArqExcel.ViewImportarArquivoExcel().criar(arquivosCarregados)
+            ctlDadosArquivoExcel = vwArqExcel.ViewImportarArquivoExcel().criar(arquivosCarregados, True)
             if ctlDadosArquivoExcel.arquivosExcelImportados:
                 st.dataframe(ctlDadosArquivoExcel.arquivosExcelImportados, hide_index=True)
             

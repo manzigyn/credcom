@@ -6,7 +6,7 @@ import string
 import streamlit as st
 import time
 import math
-
+from datetime import datetime
 
 global MESES_NOME
 MESES_NOME = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
@@ -168,8 +168,20 @@ def add_logo2(imagem):
         unsafe_allow_html=True,
     )    
     
+def tratarDiretorio(valor: str) -> str:
+    if estarVazia(valor):
+        return ""
+    caracteres = ['/','\\']
+    for caracter in caracteres:
+        if caracter in valor and valor[-1] != caracter:
+            return f'{valor}{caracter}'
+    return valor
+
 def inserirCaracterFinal(valor: str, caracter: str) -> str:
     return f'{valor}{caracter}' if valor and valor[-1] != caracter else valor
 
 def estarVazia(valor: str) -> bool:
     return len(valor.strip()) == 0
+
+def obterDataHorarioCompleta() -> str:
+    return datetime.today().strftime('%d/%m/%Y %H:%M:%S')    

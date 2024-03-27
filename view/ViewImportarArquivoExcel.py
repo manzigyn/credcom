@@ -6,8 +6,8 @@ import traceback
 @dataclass
 class ViewImportarArquivoExcel():
     
-    def criar(self, arquivosCarregados) -> ctlArqExc.DadosArquivoExcel:
-        ctlDadosArquivoExcel = ctlArqExc.DadosArquivoExcel(arquivosCarregados)
+    def criar(self, arquivosCarregados, viaUpload: bool = False) -> ctlArqExc.DadosArquivoExcel:
+        ctlDadosArquivoExcel = ctlArqExc.DadosArquivoExcel(arquivosCarregados, viaUpload)
 
         if ctlDadosArquivoExcel.haNovosArquivos():
             st.warning(f'Pagamento {len(ctlDadosArquivoExcel.lista_pagamento)} Distribuição: {len(ctlDadosArquivoExcel.lista_distribuicao)}')

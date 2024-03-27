@@ -20,8 +20,8 @@ class DadosArquivoExcel():
     arquivosCarregados = []
     arquivosExcelImportados =[]
     
-    def __init__(self, arquivosCarregados):
-        if not arquivosCarregados:
+    def __init__(self, arquivosCarregados, viaUpload: bool=False):
+        if not arquivosCarregados and not viaUpload:
             self.listarArquivos()
         else:
             self.arquivosCarregados = arquivosCarregados
@@ -86,7 +86,7 @@ class DadosArquivoExcel():
     
     def gravarArquivoExcelProcessado(self, arquivo, tipo: enTipo.EnumTipoArquivoExcel, resultado: str = 'Processado com sucesso'):
         nome = str(arquivo) if isinstance(arquivo, str) else arquivo.name
-        logUpload = entUpl.LogUpload(Nome=nome, Tipo=tipo, Resultado=resultado)
+        logUpload = entUpl.LogUpload(Nome=nome, Tipo=tipo, Resultado=resultado, Processamento=ut.obterDataHorarioCompleta())
         self.arquivosExcelImportados.append(logUpload)
         CTLLogUpload.salvar(logUpload)
         

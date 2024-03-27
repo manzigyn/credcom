@@ -14,10 +14,10 @@ class Parametrizacao():
     dir_apresentacao: str = ''
     
     def criar(self, dir_dados: str, dir_processados: str, dir_template: str, dir_apresentacao: str):
-        self.dir_dados = ut.inserirCaracterFinal(dir_dados,'\\')
-        self.dir_processados = ut.inserirCaracterFinal(dir_processados,'\\')
-        self.dir_template = ut.inserirCaracterFinal(dir_template, '\\')
-        self.dir_apresentacao = ut.inserirCaracterFinal(dir_apresentacao, '\\')
+        self.dir_dados = ut.tratarDiretorio(dir_dados)
+        self.dir_processados = ut.tratarDiretorio(dir_processados)
+        self.dir_template = ut.tratarDiretorio(dir_template)
+        self.dir_apresentacao = ut.tratarDiretorio(dir_apresentacao)
     
     def carregar(self, lista: List[dto.DTOParametrizacao]):
         for obj in lista:
